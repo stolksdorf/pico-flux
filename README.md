@@ -30,7 +30,7 @@ module.exports = {
 ```
 
 ### Example store.js
-```
+```javascript
 var flux = require('pico-flux');
 
 var Store = {
@@ -46,7 +46,8 @@ module.exports = flux.createStore({
 
 	SET_INC : function(inc){
 		Store.inc = inc;
-		return true; //If your action listener is synchronous, you can just return true to fire the change event
+		//If your action listener is synchronous, you can just return true to fire the change event
+		return true;
 	},
 },{
 	//And your store getters as the second parameter
