@@ -16,7 +16,7 @@ An incredibly tiny version of flux. **Under 40 lines of code**.
 
 
 ### Example actions.js
-```
+```javascript
 var dispatch = require('pico-flux').dispatch;
 
 module.exports = {
@@ -59,7 +59,7 @@ module.exports = flux.createStore({
 ```
 
 ### Example component.jsx
-```
+```javascript
 var React = require('react');
 var Store = require('./store.js');
 var Actions = require('./actions.js');
