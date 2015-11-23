@@ -1,0 +1,26 @@
+{
+  "name": "pico-flux",
+  "version": "1.0.0",
+  "description": "An incredibly tiny version of flux",
+  "main": "pico-flux.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stolksdorf/pico-flux.git"
+  },
+  "keywords": [
+    "react",
+    "flux",
+    "tiny",
+    "simple",
+    "lightweight"
+  ],
+  "author": "stolksdorf",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stolksdorf/pico-flux/issues"
+  },
+  "homepage": "https://github.com/stolksdorf/pico-flux#readme"
+}
