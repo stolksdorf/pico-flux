@@ -45,13 +45,22 @@ module.exports = flux.createStore({
 	//Add your action listeners as the first parameter
 	ADD_INC : function(val){
 		Store.inc += val;
-		this.emitChange();
 	},
 
+	//If you don't want your action listens to emit a change, return false
 	SET_INC : function(inc){
 		Store.inc = inc;
-		//If your action listener is synchronous, you can just return true to fire the change event
-		return true;
+		return false;
+	},
+
+	//If your action handler is asynchronous, use the this.emitChange() to trigger a store update manually.
+	GET_INC : function(){
+		var self = this;
+		request.get('/api/inc', function(inc){
+			Store.inc = inc;
+			self.emitChange();
+		});
+		return false;
 	},
 },{
 	//And your store getters as the second parameter
@@ -69,6 +78,7 @@ var Store = require('./store.js');
 var Actions = require('./actions.js');
 
 module.exports = React.createClass{
+	//Will make this component listen for updates from this store and call onStoreChange
 	mixins : [Store.mixin()],
 
 	getInitialState : function(){

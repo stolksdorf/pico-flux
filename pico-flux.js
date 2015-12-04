@@ -27,8 +27,8 @@ module.exports = {
 
 		ActionEmitter.on('dispatch', function(actionName, argArray){
 			if(typeof listeners[actionName] === 'function'){
-				var shouldEmit = listeners[actionName].apply(storeInstance, argArray);
-				if(shouldEmit) storeInstance.emitChange();
+				var shouldNotEmit = listeners[actionName].apply(storeInstance, argArray);
+				if(shouldNotEmit !== false) storeInstance.emitChange();
 			}
 		});
 		return storeInstance;
