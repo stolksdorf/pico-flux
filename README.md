@@ -1,7 +1,11 @@
 # pico-flux
 An incredibly tiny version of flux. **Under 40 lines of code**.
 
-`npm install pico-flux`
+[![NPM](https://nodei.co/npm/pico-flux.png)](https://nodei.co/npm/pico-flux/)
+
+*Goal* : pico-flux was made to quickly bootstrap your project with a easy to understand and agnostic implementation of Flux.
+If you need to make modifications or add features, it's easy to understand what's happening under the hood and make tweaks.
+As your project grows, it's easy to swap out to another more full-featured flux implementation.
 
 **Features**
 
