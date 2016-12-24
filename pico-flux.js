@@ -1,3 +1,4 @@
+const React = require('react');
 const events = require('events');
 const actionEmitter = new events.EventEmitter();
 
@@ -11,10 +12,10 @@ module.exports = {
 			createSmartComponent : (component, getter) => {
 				return React.createClass({
 					getInitialState: function() {
-						return getter(); //Call with scope on component?
+						return getter.apply(component); //Call with scope on component?
 					},
 					updateHandler : function(){
-						this.setState(getter()); //Call with scope on component?
+						this.setState(getter.apply(component)); //Call with scope on component?
 					},
 					componentWillMount: function() {
 						storeEmitter.on('change', this.updateHandler);
@@ -40,4 +41,4 @@ module.exports = {
 		});
 		return store;
 	}
-}
+};
