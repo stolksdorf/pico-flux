@@ -9,11 +9,12 @@ As your project grows, it's easy to swap out to another more full-featured flux 
 
 **Features**
 
+* **Under 40 lines of code**
 * Central dispatcher
 * React component mixin for subscribing to stores
 * Simplified and agnostic store management
 
-**Anti-Features** (features removed from the flux spec to simplify)
+**Anti-Features** (features removed to reduce complexity)
 
 * Stores don't need to explicitly register with the central dispatcher
 * No `.waitFor()` for chaining stores
