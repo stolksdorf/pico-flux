@@ -1,36 +1,43 @@
-var events = require('events');
-var ActionEmitter = new events.EventEmitter();
+const events = require('events');
+const actionEmitter = new events.EventEmitter();
 
 module.exports = {
-	dispatch : function(type){
-		var args = Array.prototype.slice.call(arguments, 1);
-		ActionEmitter.emit('dispatch', type, args);
+	dispatch : (actionType, ...args) => {
+		actionEmitter.emit('dispatch', actionType, ...args);
 	},
-	createStore : function(listeners, methods){
-		var StoreEmitter = new events.EventEmitter();
-		var storeInstance = Object.assign({}, {
-			mixin : function(){
-				return {
-					componentWillMount : function(){
-						if(typeof this.onStoreChange !== 'function') throw "Component does not have 'onStoreChange'. Check " + this.constructor.displayName;
-						StoreEmitter.on('change', this.onStoreChange);
+	createStore : (listeners) => {
+		const storeEmitter = new events.EventEmitter();
+		const store = {
+			createSmartComponent : (component, getter) => {
+				return React.createClass({
+					getInitialState: function() {
+						return getter(); //Call with scope on component?
+					},
+					updateHandler : function(){
+						this.setState(getter()); //Call with scope on component?
+					},
+					componentWillMount: function() {
+						storeEmitter.on('change', this.updateHandler);
 					},
 					componentWillUnmount : function(){
-						StoreEmitter.removeListener('change', this.onStoreChange);
+						storeEmitter.removeListener('change', this.updateHandler);
 					},
-				}
+					render : function(){
+						return React.createElement(component, Object.assign({}, this.props, this.state));
+					}
+				});
 			},
-			emitChange : function(){
-				StoreEmitter.emit('change');
+			emitChange : ()=>{
+				storeEmitter.emit('change');
 			}
-		}, methods);
+		};
 
-		ActionEmitter.on('dispatch', function(actionName, argArray){
+		actionEmitter.on('dispatch', (actionName, ...args)=>{
 			if(typeof listeners[actionName] === 'function'){
-				var shouldNotEmit = listeners[actionName].apply(storeInstance, argArray);
-				if(shouldNotEmit !== false) storeInstance.emitChange();
+				var shouldNotEmit = listeners[actionName].apply(store, args);
+				if(shouldNotEmit !== false) store.emitChange();
 			}
 		});
-		return storeInstance;
+		return store;
 	}
 }

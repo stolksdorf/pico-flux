@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/stolksdorf/pico-flux/issues"
   },
-  "homepage": "https://github.com/stolksdorf/pico-flux#readme"
+  "homepage": "https://github.com/stolksdorf/pico-flux#readme",
+  "dependencies": {
+    "react": "^15.4.1"
+  }
 }
