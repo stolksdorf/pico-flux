@@ -115,7 +115,7 @@ module.exports = Store.createSmartComponent(Counter,
 ### api
 
 #### `flux.dispatch(actionName, ...args)`
-Dispathes an event to all stores. If the store has a listener set with that `actionName` it will call it with the provided `args`.
+Dispatches an event to all stores. If the store has a listener set with that `actionName` it will be called with the provided `args`.
 
 #### `flux.createStore({ actionName : listenerFn, ...})`
 Creates a new store object subscribed to the central dispatcher with the provided mapping of listeners. Listener functions, when called, will emit a change event by default. If you do not want the result of a listener to trigger an update, have it return `false`.
