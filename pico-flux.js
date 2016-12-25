@@ -1,27 +1,28 @@
 const React = require('react');
-const events = require('events');
-const actionEmitter = new events.EventEmitter();
+const EventEmitter = require('events');
 
-module.exports = {
+const Flux = {
+	actionEmitter : new EventEmitter(),
 	dispatch : (actionType, ...args) => {
-		actionEmitter.emit('dispatch', actionType, ...args);
+		Flux.actionEmitter.emit('dispatch', actionType, ...args);
 	},
-	createStore : (listeners) => {
-		const storeEmitter = new events.EventEmitter();
+	createStore : (actionListeners) => {
 		const store = {
+			updateEmitter : new EventEmitter(),
 			createSmartComponent : (component, getter) => {
 				return React.createClass({
+					displayName : `smart${component.displayName || component.name}`,
 					getInitialState: function() {
-						return getter.apply(component); //Call with scope on component?
+						return getter(Object.assign({}, component.defaultProps, this.props));
 					},
 					updateHandler : function(){
-						this.setState(getter.apply(component)); //Call with scope on component?
+						this.setState(getter(Object.assign({}, component.defaultProps, this.props, this.state)));
 					},
-					componentWillMount: function() {
-						storeEmitter.on('change', this.updateHandler);
+					componentWillMount : function() {
+						store.updateEmitter.on('change', this.updateHandler);
 					},
 					componentWillUnmount : function(){
-						storeEmitter.removeListener('change', this.updateHandler);
+						store.updateEmitter.removeListener('change', this.updateHandler);
 					},
 					render : function(){
 						return React.createElement(component, Object.assign({}, this.props, this.state));
@@ -29,16 +30,15 @@ module.exports = {
 				});
 			},
 			emitChange : ()=>{
-				storeEmitter.emit('change');
+				store.updateEmitter.emit('change');
 			}
 		};
-
-		actionEmitter.on('dispatch', (actionName, ...args)=>{
-			if(typeof listeners[actionName] === 'function'){
-				var shouldNotEmit = listeners[actionName].apply(store, args);
-				if(shouldNotEmit !== false) store.emitChange();
+		Flux.actionEmitter.on('dispatch', (actionName, ...args)=>{
+			if(typeof actionListeners[actionName] === 'function'){
+				if(actionListeners[actionName](...args) !== false) store.emitChange();
 			}
 		});
 		return store;
 	}
 };
+module.exports = Flux;
