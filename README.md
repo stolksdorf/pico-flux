@@ -14,7 +14,6 @@ As your project grows, it's easy to swap out to another more full-featured flux 
 npm install --save pico-flux
 ```
 
-
 ### features
 
 - **Under 50 lines of code**
