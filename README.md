@@ -1,5 +1,5 @@
 # pico-flux
-An incredibly tiny version of flux. **Under 40 lines of code**.
+An incredibly tiny version of flux. **Under 50 lines of code**.
 
 [![NPM](https://nodei.co/npm/pico-flux.png)](https://nodei.co/npm/pico-flux/)
 
