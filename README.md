@@ -7,99 +7,133 @@ An incredibly tiny version of flux. **Under 40 lines of code**.
 If you need to make modifications or add features, it's easy to understand what's happening under the hood and make tweaks.
 As your project grows, it's easy to swap out to another more full-featured flux implementation.
 
-**Features**
 
-* **Under 40 lines of code**
-* Central dispatcher
-* React component mixin for subscribing to stores
-* Simplified and agnostic store management
+### install
+
+```
+npm install --save pico-flux
+```
+
+### features
+
+- **Under 50 lines of code**
+- Central dispatcher
+- High Order Componenet to wrap existing componenets to make them responsives to store changes.
+- Simplified and agnostic store management
 
 **Anti-Features** (features removed to reduce complexity)
 
-* Stores don't need to explicitly register with the central dispatcher
-* No `.waitFor()` for chaining stores
+- Stores don't need to explicitly register with the central dispatcher
+- No `.waitFor()` for chaining stores
 
 
-### Example actions.js
+### example actions.js
 ```javascript
-var dispatch = require('pico-flux').dispatch;
+const dispatch = require('pico-flux').dispatch;
 
-module.exports = {
-	addInc : function(val){
-		dispatch('ADD_INC', val || 1);
+const Actions = {
+	addInc : (val = 1) => {
+		dispatch('ADD_INC', val);
 	},
-	setInc : function(newInc){
+	delayInc : (val = 1) => {
+		dispatch('DELAY_INC', val)
+	},
+	setInc : (newInc) => {
 		dispatch('SET_INC', newInc);
 	},
-}
-```
-
-### Example store.js
-```javascript
-var flux = require('pico-flux');
-
-var Store = {
-	inc : 0
 };
 
-module.exports = flux.createStore({
-	//Add your action listeners as the first parameter
-	ADD_INC : function(val){
-		Store.inc += val;
+module.exports = Actions;
+```
+
+### example store.js
+```javascript
+const flux = require('pico-flux');
+
+let State = {
+	count : 0
+};
+
+const Store = flux.createStore({
+	INC : (val) => {
+		State.count += val;
 	},
 
 	//If you don't want your action listens to emit a change, return false
-	SET_INC : function(inc){
-		Store.inc = inc;
-		return false;
+	SET_INC : (val) => {
+		State.count = val;
 	},
 
-	//If your action handler is asynchronous, use the this.emitChange() to trigger a store update manually.
-	GET_INC : function(){
-		var self = this;
-		request.get('/api/inc', function(inc){
-			Store.inc = inc;
-			self.emitChange();
-		});
+	//If your action handler is asynchronous, use the Store.emitChange() to trigger a store update manually.
+	DELAY_INC : (val) => {
+		setTimeout(()=>{
+			State.count += val;
+			Store.emitChange();
+		}, 2000);
 		return false;
-	},
-},{
-	//And your store getters as the second parameter
-	getInc : function(){
-		return Store.inc;
-	},
-})
+	}
+});
 
+Store.getCount = ()=>{
+	return State.count;
+};
+
+module.exports = Store;
 ```
 
-### Example component.jsx
+### example component.jsx
 ```javascript
-var React = require('react');
-var Store = require('./store.js');
-var Actions = require('./actions.js');
+const React = require('react');
 
-module.exports = React.createClass{
-	//Will make this component listen for updates from this store and call onStoreChange
-	mixins : [Store.mixin()],
+const Store = require('./store.js');
+const Actions = require('./actions.js');
 
-	getInitialState : function(){
+const Counter = React.createClass({
+	getDefaultProps: function() {
 		return {
-			inc : Store.getInc()
-		}
+			count : 0,
+			offset : 0
+		};
 	},
-	onStoreChange : function(){
-		this.setState({
-			inc : Store.getInc()
-		})
+	handleClick : function(){
+		Actions.inc();
 	},
-	handleIncClick : function(){
-		Actions.addInc();
-	},
-	render : function(){
-		return <div>
-			{this.state.inc}
-			<button onClick={this.handleIncClick}>Increment</button>
+	render: function(){
+		return <div className='counter' onClick={this.handleClick}>
+			{this.props.count + this.props.offset}
 		</div>
-	},
-}
+	}
+});
+
+module.exports = Store.createSmartComponent(Counter,
+	(props) => {
+		return {count : Store.getCount()};
+	}
+);
 ```
+
+### api
+
+#### `flux.dispatch(actionName, ...args)`
+Dispathes an event to all stores. If the store has a listener set with that `actionName` it will call it with the provided `args`.
+
+#### `flux.createStore({ actionName : listenerFn, ...})`
+Creates a new store object subscribed to the central dispatcher with the provided mapping of listeners. Listener functions, when called, will emit a change event by default. If you do not want the result of a listener to trigger an update, have it return `false`.
+
+#### `flux.actionEmitter`
+Access to `pico-flux`s central action dispatcher as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter).
+
+#### `store.createSmartComponent(reactComponent, propsGetter)`
+Creates a [Higher-Order-Component](https://facebook.github.io/react/blog/2016/07/13/mixins-considered-harmful.html#higher-order-components-explained) wrapping the provided `reactComponent`. This HOC subscribes to the store you used to create it and will update it's internal state whenever the store updates.
+
+It calls the `propsGetter` function to determine what it's state should be, then passes this state and any props passed into it as props down to the wrapped component. The `propsGetter` will be passed the current props as it's only arguement.
+
+#### `store.emitChange()`
+Manually triggers a store update. Useful for conditionally store updating, or async operations.
+
+#### `store.updateEmitter`
+Access to the store's update emitter as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter).
+
+
+
+
