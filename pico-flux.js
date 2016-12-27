@@ -13,7 +13,7 @@ var Flux = {
 			updateEmitter : new EventEmitter(),
 			createSmartComponent : function(component, getter){
 				return React.createClass({
-					displayName : `smart${component.displayName || component.name}`,
+					displayName : 'smart' + component.displayName || component.name,
 					getInitialState: function(){
 						return getter(Object.assign({}, component.defaultProps, this.props));
 					},
