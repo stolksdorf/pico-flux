@@ -24,8 +24,15 @@ const Flux = {
 					componentWillUnmount : function(){
 						store.updateEmitter.removeListener('change', this.updateHandler);
 					},
+					getRef : function(){
+						return this.refs.wrappedComponent;
+					},
 					render : function(){
-						return React.createElement(component, Object.assign({}, this.props, this.state));
+						return React.createElement(component, Object.assign({},
+							this.props,
+							this.state,
+							{ref : 'wrappedComponent'}
+						));
 					}
 				});
 			},

@@ -124,7 +124,7 @@ Creates a new store object subscribed to the central dispatcher with the provide
 #### `flux.actionEmitter`
 Access to `pico-flux`s central action dispatcher as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter).
 
-#### `store.createSmartComponent(reactComponent, propsGetter) -> component`
+#### `store.createSmartComponent(reactComponent, propsGetter) -> smartComponent`
 Creates a [Higher-Order-Component](https://facebook.github.io/react/blog/2016/07/13/mixins-considered-harmful.html#higher-order-components-explained) wrapping the provided `reactComponent`. This HOC subscribes to the store you used to create it and will update it's internal state whenever the store updates.
 
 It calls the `propsGetter` function to determine what it's state should be, then passes this state and any props passed into it as props down to the wrapped component. The `propsGetter` will be passed the current props as it's only arguement.
@@ -135,6 +135,8 @@ Manually triggers a store update. Useful for conditionally updating the store, o
 #### `store.updateEmitter`
 Access to the store's update emitter as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter).
 
+#### `smartComponent.getRef() -> wrappedComponent`
+If you need access the wrapped component instance, calling `.getRef()` on the smart component will return the ref to it's wrapped component.
 
 
 
