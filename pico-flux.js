@@ -1,24 +1,26 @@
-const React = require('react');
-const EventEmitter = require('events');
+var React = require('react');
+var EventEmitter = require('events');
 
-const Flux = {
+var Flux = {
 	actionEmitter : new EventEmitter(),
-	dispatch : (actionType, ...args) => {
-		Flux.actionEmitter.emit('dispatch', actionType, ...args);
+	dispatch : function(actionType, args){
+		args = [].slice.call(arguments);
+		args.unshift('dispatch');
+		Flux.actionEmitter.emit.apply(Flux.actionEmitter, args);
 	},
-	createStore : (actionListeners) => {
-		const store = {
+	createStore : function(actionListeners){
+		var store = {
 			updateEmitter : new EventEmitter(),
-			createSmartComponent : (component, getter) => {
+			createSmartComponent : function(component, getter){
 				return React.createClass({
 					displayName : `smart${component.displayName || component.name}`,
-					getInitialState: function() {
+					getInitialState: function(){
 						return getter(Object.assign({}, component.defaultProps, this.props));
 					},
 					updateHandler : function(){
 						this.setState(getter(Object.assign({}, component.defaultProps, this.props, this.state)));
 					},
-					componentWillMount : function() {
+					componentWillMount : function(){
 						store.updateEmitter.on('change', this.updateHandler);
 					},
 					componentWillUnmount : function(){
@@ -36,13 +38,14 @@ const Flux = {
 					}
 				});
 			},
-			emitChange : ()=>{
+			emitChange : function(){
 				store.updateEmitter.emit('change');
 			}
 		};
-		Flux.actionEmitter.on('dispatch', (actionName, ...args)=>{
+		Flux.actionEmitter.on('dispatch', function(actionName, args){
 			if(typeof actionListeners[actionName] === 'function'){
-				if(actionListeners[actionName](...args) !== false) store.emitChange();
+				args = [].slice.call(arguments, 1);
+				if(actionListeners[actionName].apply(store, args) !== false) store.emitChange();
 			}
 		});
 		return store;
