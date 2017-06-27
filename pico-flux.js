@@ -1,7 +1,8 @@
-var React = require('react');
-var EventEmitter = require('events');
+const React = require('react');
+const createClass = require('create-react-class');
+const EventEmitter = require('events');
 
-var Flux = {
+const Flux = {
 	actionEmitter : new EventEmitter(),
 	dispatch : function(actionType, args){
 		args = [].slice.call(arguments);
@@ -9,10 +10,10 @@ var Flux = {
 		Flux.actionEmitter.emit.apply(Flux.actionEmitter, args);
 	},
 	createStore : function(actionListeners){
-		var store = {
+		const store = {
 			updateEmitter : new EventEmitter(),
 			createSmartComponent : function(component, getter){
-				return React.createClass({
+				return createClass({
 					displayName : 'smart' + component.displayName || component.name,
 					getInitialState: function(){
 						return getter(Object.assign({}, component.defaultProps, this.props));
