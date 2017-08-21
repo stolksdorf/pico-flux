@@ -14,12 +14,13 @@ const Flux = {
 			updateEmitter : new EventEmitter(),
 			createSmartComponent : function(component, getter){
 				return createClass({
-					displayName : 'smart' + component.displayName || component.name,
+					displayName : `smart-${component.displayName || component.name || 'Component'}`,
 					getInitialState: function(){
 						return getter(Object.assign({}, component.defaultProps, this.props));
 					},
 					updateHandler : function(){
-						this.setState(getter(Object.assign({}, component.defaultProps, this.props, this.state)));
+						const newState = getter(Object.assign({}, component.defaultProps, this.props, this.state));
+						if(newState !== false) this.setState(newState);
 					},
 					componentWillMount : function(){
 						store.updateEmitter.on('change', this.updateHandler);
@@ -27,14 +28,10 @@ const Flux = {
 					componentWillUnmount : function(){
 						store.updateEmitter.removeListener('change', this.updateHandler);
 					},
-					getRef : function(){
-						return this.refs.wrappedComponent;
-					},
 					render : function(){
 						return React.createElement(component, Object.assign({},
 							this.props,
-							this.state,
-							{ref : 'wrappedComponent'}
+							this.state
 						));
 					}
 				});
