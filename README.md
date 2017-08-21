@@ -76,9 +76,7 @@ const Store = flux.createStore({
 });
 
 //Add getters to your store for your components to get a subset of the store's state
-Store.getCount = ()=>{
-    return State.count;
-};
+Store.getCount = ()=>State.count;
 
 module.exports = Store;
 ```
@@ -104,6 +102,7 @@ const Counter = createClass({
 ```
 
 ### example smart component.jsx
+Only your smart componnt knows about actions and stores.
 ```jsx
 const Store = require('./store.js');
 const Actions = require('./actions.js');
@@ -113,8 +112,9 @@ module.exports = Store.createSmartComponent(Counter,
     (props) => {
         //If the count is identical, don't trigger a re-render
         if(props.count === Store.getCount()) return false;
+
         return {
-            count : Store.getCount(),
+            count   : Store.getCount(),
             onClick : Actions.inc()
         };
     }
