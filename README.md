@@ -28,7 +28,7 @@ npm install pico-flux
 
 
 ### example actions.js
-```javascript
+```js
 const dispatch = require('pico-flux').dispatch;
 
 const Actions = {
@@ -47,7 +47,7 @@ module.exports = Actions;
 ```
 
 ### example store.js
-```javascript
+```js
 const flux = require('pico-flux');
 
 let State = {
@@ -75,7 +75,7 @@ const Store = flux.createStore({
     }
 });
 
-//Add getters to your store for your components to get a subset of the store's state 
+//Add getters to your store for your components to get a subset of the store's state
 Store.getCount = ()=>{
     return State.count;
 };
@@ -84,7 +84,7 @@ module.exports = Store;
 ```
 
 ### example dumb component.jsx
-```javascript
+```js
 const React = require('react');
 const createClass = require('create-react-class');
 
