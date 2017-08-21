@@ -4,10 +4,8 @@ const EventEmitter = require('events');
 
 const Flux = {
 	actionEmitter : new EventEmitter(),
-	dispatch : function(actionType, args){
-		args = [].slice.call(arguments);
-		args.unshift('dispatch');
-		Flux.actionEmitter.emit.apply(Flux.actionEmitter, args);
+	dispatch : function(...args){
+		Flux.actionEmitter.emit('dispatch', ...args);
 	},
 	createStore : function(actionListeners){
 		const store = {
@@ -16,10 +14,10 @@ const Flux = {
 				return createClass({
 					displayName : `smart-${component.displayName || component.name || 'Component'}`,
 					getInitialState: function(){
-						return getter(Object.assign({}, component.defaultProps, this.props));
+						return getter.call(component, Object.assign({}, component.defaultProps, this.props));
 					},
 					updateHandler : function(){
-						const newState = getter(Object.assign({}, component.defaultProps, this.props, this.state));
+						const newState = getter.call(component, Object.assign({}, component.defaultProps, this.props, this.state));
 						if(newState !== false) this.setState(newState);
 					},
 					componentWillMount : function(){
@@ -40,10 +38,9 @@ const Flux = {
 				store.updateEmitter.emit('change');
 			}
 		};
-		Flux.actionEmitter.on('dispatch', function(actionName, args){
+		Flux.actionEmitter.on('dispatch', function(actionName, ...args){
 			if(typeof actionListeners[actionName] === 'function'){
-				args = [].slice.call(arguments, 1);
-				if(actionListeners[actionName].apply(store, args) !== false) store.emitChange();
+				if(actionListeners[actionName](args) !== false) store.emitChange();
 			}
 		});
 		return store;

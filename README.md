@@ -84,23 +84,19 @@ module.exports = Store;
 ```
 
 ### example dumb component.jsx
-```js
+```jsx
 const React = require('react');
 const createClass = require('create-react-class');
-
-const Actions = require('./actions.js');
 
 const Counter = createClass({
     getDefaultProps: function() {
         return {
-            count : 0
+            count : 0,
+            onClick : ()=>{}
         };
     },
-    handleClick : function(){
-        Actions.inc();
-    },
     render: function(){
-        return <div className='counter' onClick={this.handleClick}>
+        return <div className='counter' onClick={this.props.onClick}>
             {this.props.count}
         </div>
     }
@@ -110,11 +106,17 @@ const Counter = createClass({
 ### example smart component.jsx
 ```jsx
 const Store = require('./store.js');
+const Actions = require('./actions.js');
 const Counter = require('./counter.jsx');
 
 module.exports = Store.createSmartComponent(Counter,
     (props) => {
-        return {count : Store.getCount()};
+        //If the count is identical, don't trigger a re-render
+        if(props.count === Store.getCount()) return false;
+        return {
+            count : Store.getCount(),
+            onClick : Actions.inc()
+        };
     }
 );
 ```
@@ -131,16 +133,13 @@ Creates a new store object subscribed to the central dispatcher with the provide
 Access to `pico-flux`s central action dispatcher as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter).
 
 #### `store.createSmartComponent(reactComponent, propsGetter) -> smartComponent`
-Creates a [Higher-Order-Component](https://facebook.github.io/react/blog/2016/07/13/mixins-considered-harmful.html#higher-order-components-explained) wrapping the provided `reactComponent`. This HOC subscribes to the store you used to create it and will update it's internal state whenever the store updates using the `propsGetter` function you passed. The `propsGetter` will be passed the smart component's props as an arguement.
+Creates a [Higher-Order-Component](https://facebook.github.io/react/docs/higher-order-components.html) wrapping the provided `reactComponent`. This HOC subscribes to the store you used to create it and will update it's internal state whenever the store updates using the `propsGetter` function you passed. The `propsGetter` will be passed the smart component's props as an argument.
+
+If your `propsGetter` returns `false`, it will not trigger a re-render. This is useful for placing logic within your smart component to throttle excessive re-renders from store updates.
 
 #### `store.emitChange()`
 Manually triggers a store update. Useful for conditionally updating the store, or async operations.
 
 #### `store.updateEmitter`
 Access to the store's update emitter as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter).
-
-#### `smartComponent.getRef() -> wrappedComponent`
-If you need access the wrapped component instance, calling `.getRef()` on the smart component will return the ref to it's wrapped component.
-
-
 
