@@ -40,7 +40,7 @@ const Flux = {
 		};
 		Flux.actionEmitter.on('dispatch', function(actionName, ...args){
 			if(typeof actionListeners[actionName] === 'function'){
-				if(actionListeners[actionName](args) !== false) store.emitChange();
+				if(actionListeners[actionName](...args) !== false) store.emitChange();
 			}
 		});
 		return store;

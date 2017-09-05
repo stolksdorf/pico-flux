@@ -1,6 +1,6 @@
 {
   "name": "pico-flux",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "An incredibly tiny version of flux",
   "main": "pico-flux.js",
   "scripts": {
