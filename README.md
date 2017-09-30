@@ -102,7 +102,7 @@ const Counter = createClass({
 ```
 
 ### example smart component.jsx
-Only your smart componnt knows about actions and stores.
+Only your smart component knows about actions and stores.
 ```jsx
 const Store = require('./store.js');
 const Actions = require('./actions.js');
@@ -133,7 +133,7 @@ Creates a new store object subscribed to the central dispatcher with the provide
 Access to `pico-flux`s central action dispatcher as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter).
 
 #### `store.createSmartComponent(reactComponent, propsGetter) -> smartComponent`
-Creates a [Higher-Order-Component](https://facebook.github.io/react/docs/higher-order-components.html) wrapping the provided `reactComponent`. This HOC subscribes to the store you used to create it and will update it's internal state whenever the store updates using the `propsGetter` function you passed. The `propsGetter` will be passed the smart component's props as an argument.
+Creates a [Higher-Order-Component](https://facebook.github.io/react/docs/higher-order-components.html) wrapping the provided `reactComponent`. This HOC subscribes to the store you used to create it and will update its internal state whenever the store updates using the `propsGetter` function you passed. The `propsGetter` will be passed the smart component's props as an argument.
 
 If your `propsGetter` returns `false`, it will not trigger a re-render. This is useful for placing logic within your smart component to throttle excessive re-renders from store updates.
 
