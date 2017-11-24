@@ -17,9 +17,9 @@ npm install pico-flux
 ### features
 
 - **Under 50 lines of code**
-- Central dispatcher
 - Use High Order Components to wrap existing "dumb" components to make them responsive to store changes.
 - Simplified and agnostic store management
+- Stores can emit custom signals to trigger updates in specific components.
 
 **Anti-Features** (features removed to reduce complexity)
 
@@ -27,19 +27,27 @@ npm install pico-flux
 - No `.waitFor()` for chaining stores
 
 
+### How it works
+This library creates a data store for your application that will emit update events when data has been updated. You define a series of "setters" and "getters" to update and extract your data in a controlled way.
+
+
+
 ### example actions.js
 ```js
-const dispatch = require('pico-flux').dispatch;
+const dispatch = require('./mystore.js').set;
 
 const Actions = {
     inc : (val = 1) => {
-        dispatch('ADD_INC', val);
+        dispatch.addInc(val);
     },
     delayInc : (val = 1, time = 1000) => {
-        dispatch('DELAY_INC', val, time);
+        setTimeout(()=>{
+
+        })
+        dispatch.delayInc(val, time);
     },
     setInc : (newInc) => {
-        dispatch('SET_INC', newInc);
+        dispatch.setInc(newInc);
     },
 };
 
@@ -54,19 +62,19 @@ let State = {
     count : 0
 };
 
-const Store = flux.createStore({
-    INC : (val) => {
+const Store = flux({
+    inc : (val) => {
         State.count += val;
     },
 
     //If you don't want your action listens to emit a change, return false
-    SET_INC : (val) => {
+    setInc : (val) => {
         State.count = val;
         return false;
     },
 
     //If your action handler is asynchronous, use the Store.emitChange() to trigger a store update manually.
-    DELAY_INC : (val, time) => {
+    delayInc : (val, time) => {
         setTimeout(()=>{
             State.count += val;
             Store.emitChange();
