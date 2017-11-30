@@ -28,26 +28,49 @@ npm install pico-flux
 
 
 ### How it works
-This library creates a data store for your application that will emit update events when data has been updated. You define a series of "setters" and "getters" to update and extract your data in a controlled way.
+This library creates a data store for your application that will emit update events when data has been updated. You define a series of "actions" and "getters" to update and extract your data in a controlled way.
+
+
+
+### api
+
+#### `flux({ actionName : listenerFn, ...}) -> store`
+Creates a new store object with it's own event emitter and smart component. The passed in action functions are bound to the `store.actions` object and will automatically emit an `update` event when called unless they return `false`.
+
+#### `store.actions`
+Access to the passed in actions functions from creation. These should not be used directly within dumb components, but passed in as props via smart componesnt to fully decouple dumb components from the store. Each action call will automatically fire an `update` event, which by defaults all smart components are listening for. If the action handler specifically returns `false` this event will not be fired. Useful if the action didn't actually change any data.
+
+#### `<store.component component={} getProps={()=>{}} [event='update'] />`
+Creates a [Higher-Order-Component](https://facebook.github.io/react/docs/higher-order-components.html) wrapping the provided `component`. This HOC subscribes to the store you used to create it and will update it's internal state whenever the store emits the `event` using the object returned from the `getProps` function you passed.
+
+If your `getProps` returns `false`, it will not trigger a state update. This is useful for placing logic within your smart component to throttle excessive re-renders from store updates.
+
+#### `store.emit(event='update')`
+Manually emits a store event. Useful for conditionally updating the store, async operations, or custom events that specific smart components are listening for.
+
+#### `store.emitter`
+Access to the store's update emitter as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter).
+
 
 
 
 ### example actions.js
 ```js
-const dispatch = require('./mystore.js').set;
+const Store = require('./store.js');
 
 const Actions = {
     inc : (val = 1) => {
-        dispatch.addInc(val);
+        Actions.setVal(Store.getVal() + val);
     },
     delayInc : (val = 1, time = 1000) => {
+        Store.actions.setPending();
         setTimeout(()=>{
-
-        })
-        dispatch.delayInc(val, time);
+            Actions.inc(va1);
+            Store.actions.setPending(false);
+        }, time)
     },
-    setInc : (newInc) => {
-        dispatch.setInc(newInc);
+    setVal : (newVal) => {
+        Store.actions.setVal(newVal);
     },
 };
 
@@ -59,32 +82,22 @@ module.exports = Actions;
 const flux = require('pico-flux');
 
 let State = {
-    count : 0
+    value : 0,
+    pending : false
 };
 
 const Store = flux({
-    inc : (val) => {
-        State.count += val;
+    setVal(val){
+        State.value = val;
     },
-
-    //If you don't want your action listens to emit a change, return false
-    setInc : (val) => {
-        State.count = val;
-        return false;
-    },
-
-    //If your action handler is asynchronous, use the Store.emitChange() to trigger a store update manually.
-    delayInc : (val, time) => {
-        setTimeout(()=>{
-            State.count += val;
-            Store.emitChange();
-        }, time);
-        return false;
+    setPending(state = true){
+        State.pending = state;
     }
 });
 
 //Add getters to your store for your components to get a subset of the store's state
-Store.getCount = ()=>State.count;
+Store.getValue  = ()=>State.value;
+Store.isPending = ()=>State.pending;
 
 module.exports = Store;
 ```
@@ -95,13 +108,13 @@ const React = require('react');
 const createClass = require('create-react-class');
 
 const Counter = createClass({
-    getDefaultProps: function() {
+    getDefaultProps(){
         return {
             count : 0,
             onClick : ()=>{}
         };
     },
-    render: function(){
+    render(){
         return <div className='counter' onClick={this.props.onClick}>
             {this.props.count}
         </div>
@@ -110,44 +123,22 @@ const Counter = createClass({
 ```
 
 ### example smart component.jsx
-Only your smart componnt knows about actions and stores.
+Only your smart componnt knows about actions and stores. You should pass in all references to them as props.
+
 ```jsx
 const Store = require('./store.js');
 const Actions = require('./actions.js');
 const Counter = require('./counter.jsx');
 
-module.exports = Store.createSmartComponent(Counter,
-    (props) => {
-        //If the count is identical, don't trigger a re-render
-        if(props.count === Store.getCount()) return false;
-
-        return {
-            count   : Store.getCount(),
-            onClick : Actions.inc()
-        };
-    }
-);
+module.exports = (props)=>{
+    return <Store.component
+        component={Counter}
+        getProps={()=>{
+            return {
+                count   : Store.getValue(),
+                onClick : Actions.inc()
+            }
+        }}
+    />
+}
 ```
-
-### api
-
-#### `flux.dispatch(actionName, ...args)`
-Dispatches an event to all stores. If the store has a listener set with that `actionName` it will be called with the provided `args`.
-
-#### `flux.createStore({ actionName : listenerFn, ...}) -> store`
-Creates a new store object subscribed to the central dispatcher with the provided mapping of listeners. Listener functions, when called, will emit a change event by default. If you do not want the result of a listener to trigger an update, have it return `false`.
-
-#### `flux.actionEmitter`
-Access to `pico-flux`s central action dispatcher as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter).
-
-#### `store.createSmartComponent(reactComponent, propsGetter) -> smartComponent`
-Creates a [Higher-Order-Component](https://facebook.github.io/react/docs/higher-order-components.html) wrapping the provided `reactComponent`. This HOC subscribes to the store you used to create it and will update it's internal state whenever the store updates using the `propsGetter` function you passed. The `propsGetter` will be passed the smart component's props as an argument.
-
-If your `propsGetter` returns `false`, it will not trigger a re-render. This is useful for placing logic within your smart component to throttle excessive re-renders from store updates.
-
-#### `store.emitChange()`
-Manually triggers a store update. Useful for conditionally updating the store, or async operations.
-
-#### `store.updateEmitter`
-Access to the store's update emitter as an [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter).
-
