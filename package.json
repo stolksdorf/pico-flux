@@ -1,6 +1,6 @@
 {
   "name": "pico-flux",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "An incredibly tiny version of flux",
   "main": "pico-flux.js",
   "scripts": {
@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/stolksdorf/pico-flux#readme",
   "dependencies": {
-    "create-react-class": "^15.6.0",
-    "react": "^15.6.1"
+    "create-react-class": "^15.6.2",
+    "react": "^16.2.0"
   }
 }
