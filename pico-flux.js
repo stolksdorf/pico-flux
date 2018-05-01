@@ -2,13 +2,13 @@ const React        = require('react');
 const createClass  = require('create-react-class');
 const EventEmitter = require('events');
 
-const Flux = (storeActions={})=>{
+const Flux = (storeSetters={})=>{
 	const store = {
 		emitter : new EventEmitter(),
 		emit    : (evt='update')=>store.emitter.emit(evt),
-		actions : Object.keys(storeActions).reduce((acc, key)=>{
+		setters : Object.keys(storeSetters).reduce((acc, key)=>{
 			acc[key] = (...args)=>{
-				if(storeActions[key](...args) !== false) store.emit();
+				if(storeSetters[key](...args) !== false) store.emit();
 			}
 			return acc;
 		}, {}),

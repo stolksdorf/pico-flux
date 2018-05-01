@@ -34,11 +34,14 @@ This library creates a data store for your application that will emit update eve
 
 ### api
 
-#### `flux({ actionName : listenerFn, ...}) -> store`
-Creates a new store object with it's own event emitter and smart component. The passed in action functions are bound to the `store.actions` object and will automatically emit an `update` event when called unless they return `false`.
+#### `flux({ setterName : listenerFn, ...}) -> store`
+Creates a new store object with it's own event emitter and smart component. The passed in action functions are bound to the `store.setters` object and will automatically emit an `update` event when called unless they return `false`.
 
-#### `store.actions`
-Access to the passed in actions functions from creation. These should not be used directly within dumb components, but passed in as props via smart componesnt to fully decouple dumb components from the store. Each action call will automatically fire an `update` event, which by defaults all smart components are listening for. If the action handler specifically returns `false` this event will not be fired. Useful if the action didn't actually change any data.
+#### `store.setters`
+Access to the passed in setters functions from creation. These should not be used directly within dumb components, but passed in as props via smart componesnt to fully decouple dumb components from the store. Each action call will automatically fire an `update` event, which by defaults all smart components are listening for. If the action handler specifically returns `false` this event will not be fired. Useful if the action didn't actually change any data.
+
+#### `store.getters`
+Direct access to your store's state should be avoided. Instead you should write custom getters they retrieve slices of your state and return this to your code. Any calcualted values from the store should be encapsulated in a getter as well.
 
 #### `<store.component component={} getProps={()=>{}} [event='update'] />`
 Creates a [Higher-Order-Component](https://facebook.github.io/react/docs/higher-order-components.html) wrapping the provided `component`. This HOC subscribes to the store you used to create it and will update it's internal state whenever the store emits the `event` using the object returned from the `getProps` function you passed.
@@ -63,14 +66,14 @@ const Actions = {
         Actions.setVal(Store.getVal() + val);
     },
     delayInc : (val = 1, time = 1000) => {
-        Store.actions.setPending();
+        Store.setters.setPending();
         setTimeout(()=>{
             Actions.inc(va1);
-            Store.actions.setPending(false);
+            Store.setters.setPending(false);
         }, time)
     },
     setVal : (newVal) => {
-        Store.actions.setVal(newVal);
+        Store.setters.setVal(newVal);
     },
 };
 
@@ -97,7 +100,7 @@ const Store = flux({
 
 //Add getters to your store for your components to get a subset of the store's state
 Store.getValue  = ()=>State.value;
-Store.isPending = ()=>State.pending;
+Store.isPending = ()=>State.pending == true;
 
 module.exports = Store;
 ```
@@ -136,7 +139,7 @@ module.exports = (props)=>{
         getProps={()=>{
             return {
                 count   : Store.getValue(),
-                onClick : Actions.inc()
+                onClick : Actions.inc
             }
         }}
     />
