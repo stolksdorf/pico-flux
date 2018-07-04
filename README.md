@@ -37,6 +37,12 @@ This library creates a data store for your application that will emit update eve
 #### `flux({ setterName : listenerFn, ...}) -> store`
 Creates a new store object with it's own event emitter and smart component. The passed in action functions are bound to the `store.setters` object and will automatically emit an `update` event when called unless they return `false`.
 
+#### `<flux.component stores=[] component={} getProps={()=>{}} [event='update'] />`
+Creates a [Higher-Order-Component](https://facebook.github.io/react/docs/higher-order-components.html) wrapping the provided `component`. This HOC subscribes to all the stores passed in and will update it's internal state whenever one of the stores emits the `event` using the object returned from the `getProps` function you passed.
+
+If your `getProps` returns `false`, it will not trigger a state update. This is useful for placing logic within your smart component to throttle excessive re-renders from store updates.
+
+
 #### `store.setters`
 Access to the passed in setters functions from creation. These should not be used directly within dumb components, but passed in as props via smart componesnt to fully decouple dumb components from the store. Each action call will automatically fire an `update` event, which by defaults all smart components are listening for. If the action handler specifically returns `false` this event will not be fired. Useful if the action didn't actually change any data.
 
@@ -44,9 +50,7 @@ Access to the passed in setters functions from creation. These should not be use
 Direct access to your store's state should be avoided. Instead you should write custom getters they retrieve slices of your state and return this to your code. Any calcualted values from the store should be encapsulated in a getter as well.
 
 #### `<store.component component={} getProps={()=>{}} [event='update'] />`
-Creates a [Higher-Order-Component](https://facebook.github.io/react/docs/higher-order-components.html) wrapping the provided `component`. This HOC subscribes to the store you used to create it and will update it's internal state whenever the store emits the `event` using the object returned from the `getProps` function you passed.
-
-If your `getProps` returns `false`, it will not trigger a state update. This is useful for placing logic within your smart component to throttle excessive re-renders from store updates.
+Creates a `flux.component` but defaults the `stores` prop to the store that's creating it.
 
 #### `store.emit(event='update')`
 Manually emits a store event. Useful for conditionally updating the store, async operations, or custom events that specific smart components are listening for.

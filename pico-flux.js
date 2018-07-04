@@ -12,32 +12,38 @@ const Flux = (storeSetters={})=>{
 			}
 			return acc;
 		}, {}),
-		component : createClass({
-			getDefaultProps(){
-				return {
-					event     : 'update',
-					getProps  : ()=>{},
-					component : React.createElement('div')
-				}
-			},
-			getInitialState(){
-				return this.props.getProps();
-			},
-			updateHandler(){
-				const newState = this.props.getProps();
-				if(newState !== false) this.setState(newState);
-			},
-			componentWillMount(){
-				store.emitter.on(this.props.event, this.updateHandler);
-			},
-			componentWillUnmount(){
-				store.emitter.removeListener(this.props.event, this.updateHandler);
-			},
-			render(){
-				return React.createElement(this.props.component, this.state);
-			}
-		})
+		component : (props = {})=>{
+			return React.createElement(Flux.component, { stores : [store], ...props });
+		}
 	};
 	return store;
 };
+
+Flux.component = createClass({
+	getDefaultProps(){
+		return {
+			stores    : [],
+			event     : 'update',
+			getProps  : ()=>{},
+			component : React.createElement('div')
+		}
+	},
+	getInitialState(){
+		return this.props.getProps();
+	},
+	updateHandler(){
+		const newState = this.props.getProps();
+		if(newState !== false) this.setState(newState);
+	},
+	componentWillMount(){
+		this.props.stores.map((store)=>store.emitter.on(this.props.event, this.updateHandler);
+	},
+	componentWillUnmount(){
+		this.props.stores.map((store)=>store.emitter.removeListener(this.props.event, this.updateHandler);
+	},
+	render(){
+		return React.createElement(this.props.component, this.state);
+	}
+});
+
 module.exports = Flux;
