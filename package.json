@@ -1,10 +1,12 @@
 {
   "name": "pico-flux",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "description": "An incredibly tiny version of flux",
   "main": "pico-flux.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "pico-check -v",
+    "test:dev": "pico-check -v -w",
+    "lint": "eslint --fix \"**/*.{js,jsx}\""
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,9 @@
     "simple",
     "lightweight"
   ],
+  "eslintIgnore": [
+    "node_modules/*"
+  ],
   "author": "stolksdorf",
   "license": "ISC",
   "bugs": {
@@ -26,5 +31,8 @@
   "dependencies": {
     "create-react-class": "^15.6.2",
     "react": "^16.2.0"
+  },
+  "devDependencies": {
+    "pico-check": "^1.1.1"
   }
 }

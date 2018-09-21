@@ -149,3 +149,41 @@ module.exports = (props)=>{
     />
 }
 ```
+
+
+
+## Sagas
+A Saga is an event-driven data structure that wraps around a defined async function. It tracks if the function is currently processing, completed, if and errors occured, and even caches previously fetched values.
+
+
+
+```jsx
+const LogoutSmart = Smart(Logout, LogoutSaga, ()=>{
+    return {
+        isLoggingOut : LogoutSaga.isPending(),
+        errors       : LogoutSaga.errors(),
+        onClick      : ()=>LogoutSaga.fetch()
+    }
+})
+```
+
+
+```
+
+const UserSaga = Saga((userId)=>{
+    return request.get(`/api/user/${userId})
+        .then((res)=>res.body)
+});
+
+
+const UserSmart = Smart(UserView, [UserSaga, Store], ({ userId })=>{
+    if(!userId) userId = Store.getCurrentUserId();
+    return {
+        pending : UserSaga.isPending(userId),
+        errors  : UserSaga.errors(userId),
+        user    : UserSaga.get(userId)
+    }
+});
+
+<UserSmart userId='123abc' />
+```
