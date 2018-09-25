@@ -2,7 +2,7 @@
   "name": "pico-flux",
   "version": "4.0.0",
   "description": "An incredibly tiny version of flux",
-  "main": "pico-flux.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "pico-check -v",
     "test:dev": "pico-check -v -w",

@@ -175,6 +175,7 @@ const UserSaga = Saga((userId)=>{
         .then((res)=>res.body)
 });
 
+const Smart = require('pico-flux/component');
 
 const UserSmart = Smart(UserView, [UserSaga, Store], ({ userId })=>{
     if(!userId) userId = Store.getCurrentUserId();
@@ -186,4 +187,23 @@ const UserSmart = Smart(UserView, [UserSaga, Store], ({ userId })=>{
 });
 
 <UserSmart userId='123abc' />
+```
+
+
+Alternitive signature
+
+```
+const LogoutSaga = Saga(async (userId)=>request.post(`/logout/${userId}));
+
+const UserLogout = LogoutSaga('scottuserId123');
+
+
+UserLogout.fetch();
+UserLogout.get();
+UserLogout.set(true);
+UserLogout.isPending();
+//...
+
+
+
 ```

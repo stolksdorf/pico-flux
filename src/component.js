@@ -9,12 +9,7 @@ const shallowDiffers = (a, b)=>{
 
 module.exports = (component, sources, getProps=(props)=>{}, options)=>{
 	if(!Array.isArray(sources)) sources = [sources];
-
-	const opts = Object.assign({
-		event : 'update'
-	}, options);
-
-	console.log(component);
+	const opts = Object.assign({ event : 'update' }, options);
 
 	return createClass({
 		displayName : `${component.displayName}Smart`,
