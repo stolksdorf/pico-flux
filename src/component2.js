@@ -7,19 +7,32 @@ const shallowDiffers = (a, b)=>{
 	return false;
 };
 
+/**
+Must re-render on emitter AND prop change
+Minimize `getProps` calls
+
+
+**/
+
+const memoize = require('memoize-one');
+
 module.exports = (component, sources=[], getProps=(props)=>props, options)=>{
 	if(!Array.isArray(sources)) sources = [sources];
 	const opts = Object.assign({ event : 'update' }, options);
 
-	const temp =  createClass({
+	let _getProps = memoize(getProps);
+
+	const Component = createClass({
 		displayName : `${component.displayName}Smart`,
 		getInitialState(){
-			return {}//getProps(this.props);
+			return _getProps(this.props);
 		},
 		updateHandler(){
-			//this.forceUpdate();
-			const nextState = getProps(this.props);
-			if(shallowDiffers(this.state, nextState)) this.setState(nextState);
+			_getProps = memoize(getProps); //clear memoize cache
+			const nextState = _getProps(this.props);
+			if(shallowDiffers(this.state, nextState)){
+				this.setState(nextState);
+			}
 		},
 		componentDidMount(){
 			sources.map((source)=>source.emitter.on(opts.event, this.updateHandler));
@@ -28,18 +41,15 @@ module.exports = (component, sources=[], getProps=(props)=>props, options)=>{
 			sources.map((source)=>source.emitter.removeListener(opts.event, this.updateHandler));
 		},
 		render(){
-			console.log("RENDERINGs");
 			return React.createElement(component, this.state);
 		}
 	});
-
-	temp.getDerivedStateFromProps = (props, state)=>{
-		console.log('props', props);
-		const nextState = getProps(props);
-		console.log(nextState, state, shallowDiffers(state, nextState));
-		if(shallowDiffers(state, nextState)) return nextState;
+	Component.getDerivedStateFromProps = (nextProps, prevState)=>{
+		const nextState = _getProps(nextProps);
+		console.log(nextState, prevState, shallowDiffers(prevState, nextState));
+		if(shallowDiffers(prevState, nextState)) return nextState;
 		return null;
-	};
+	}
 
-	return temp;
+	return Component;
 };

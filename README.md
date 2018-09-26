@@ -169,20 +169,23 @@ const LogoutSmart = Smart(Logout, LogoutSaga, ()=>{
 
 
 ```
+const Smart = require('pico-flux/component');
+const Saga = require('pico-flux/saga');
 
 const UserSaga = Saga((userId)=>{
-    return request.get(`/api/user/${userId})
+    return request.get(`/api/user/${userId}`)
         .then((res)=>res.body)
 });
 
-const Smart = require('pico-flux/component');
 
 const UserSmart = Smart(UserView, [UserSaga, Store], ({ userId })=>{
     if(!userId) userId = Store.getCurrentUserId();
+    const saga = UserSaga(accountId);
+
     return {
-        pending : UserSaga.isPending(userId),
-        errors  : UserSaga.errors(userId),
-        user    : UserSaga.get(userId)
+        pending : saga.isPending(),
+        errors  : saga.errors(),
+        user    : saga.get()
     }
 });
 

@@ -30,9 +30,11 @@
   "homepage": "https://github.com/stolksdorf/pico-flux#readme",
   "dependencies": {
     "create-react-class": "^15.6.2",
+    "memoize-one": "^4.0.2",
     "react": "^16.2.0"
   },
   "devDependencies": {
-    "pico-check": "^1.1.1"
+    "pico-check": "^1.1.1",
+    "react-test-renderer": "^16.5.2"
   }
 }

@@ -1,11 +1,9 @@
 const EventEmitter = require('events');
 
 const sameArray = (a,b)=>{
-	//if(!a || !b) return false;
 	if(a.length !== b.length) return false;
-	for(let i in a) if(a[i] !== b[i]) return false;
-	return true;
-}
+	return a.every((val, idx)=>val===b[idx]);
+};
 
 module.exports = (setters={}, getters={})=>{
 	let memoize = {}
