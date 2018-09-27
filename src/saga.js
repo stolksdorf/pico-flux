@@ -38,7 +38,7 @@ module.exports = (asyncFunc, options={})=>{
 						stash.errors = err;
 						stash.pending = false;
 						stash.deferred.map((prom)=>prom.reject(err));
-						saga.emitter.emit('error');
+						saga.emitter.emit('oops');
 					})
 					.finally(()=>{
 						stash.deferred = [];
