@@ -1,19 +1,6 @@
 const React        = require('react');
 const createClass  = require('create-react-class');
 
-//Assumes same structure call to call
-// const isDifferent3 = (a, b)=>{
-// 	for(let i in b) if(a[i] !== b[i]) return true;
-// 	return false;
-// };
-
-// const isDifferent2 = (a, b)=>{
-// 	const keysA = Object.keys(a);
-// 	const keysB = Object.keys(b);
-// 	if(keysA.length !== keysB.length) return true;
-// 	return keysA.every((key)=>a[key]===b[key]);
-// };
-
 const isDifferent = (a, b)=>{
 	for(let i in a) if(!(i in b)) return true;
 	for(let i in b) if(a[i] !== b[i]) return true;

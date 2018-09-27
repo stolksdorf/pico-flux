@@ -1,18 +1,5 @@
 const EventEmitter = require('events');
 
-/**
-	This won't work with smart components
-	the event listeners need to be generic per saga, since you register with a
-	single saga instance on creation of a smart component
-**/
-
-/** TODO:
-
-
-/** might need a function that tries to use cache,
-	otherwise fetches
-**/
-
 module.exports = (asyncFunc, options={})=>{
 	let cache = {};
 	const getStash = (args)=>{
@@ -32,9 +19,7 @@ module.exports = (asyncFunc, options={})=>{
 		const instance = {
 			emit    : (evt='update')=>saga.emitter.emit(evt),
 			fetch   : async ()=>{
-				let deferred = {};
-				const promise = new Promise((resolve, reject)=>{ deferred = {resolve, reject} });
-				stash.deferred.push(deferred);
+				const promise = new Promise((resolve, reject)=>stash.deferred.push({resolve, reject}));
 				if(stash.pending) return promise;
 
 				stash.pending = true;
