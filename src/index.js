@@ -1,5 +1,5 @@
 module.exports = {
 	store : require('./store.js'),
-	saga : require('./saga.js'),
+	contract : require('./contract.js'),
 	component : require('./component.js')
 };

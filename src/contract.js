@@ -14,35 +14,35 @@ module.exports = (asyncFunc, options={})=>{
 		}
 		return cache[key];
 	};
-	const saga = (...args)=>{
+	const contract = (...args)=>{
 		const stash = getStash(args);
 		const instance = {
-			emit    : (evt='update')=>saga.emitter.emit(evt),
-			fetch   : async ()=>{
+			emit    : (evt='update')=>contract.emitter.emit(evt),
+			call    : async ()=>{
 				const promise = new Promise((resolve, reject)=>stash.deferred.push({resolve, reject}));
 				if(stash.pending) return promise;
 
 				stash.pending = true;
 				stash.errors = undefined;
-				saga.emitter.emit('fetch');
-				saga.emitter.emit('update');
+				contract.emitter.emit('fetch');
+				contract.emitter.emit('update');
 
 				asyncFunc(...args)
 					.then((val)=>{
 						stash.value = val;
 						stash.pending = false;
 						stash.deferred.map((prom)=>prom.resolve(val));
-						saga.emitter.emit('finish');
+						contract.emitter.emit('finish');
 					})
 					.catch((err)=>{
 						stash.errors = err;
 						stash.pending = false;
 						stash.deferred.map((prom)=>prom.reject(err));
-						saga.emitter.emit('oops');
+						contract.emitter.emit('oops');
 					})
 					.finally(()=>{
 						stash.deferred = [];
-						saga.emitter.emit('update');
+						contract.emitter.emit('update');
 					});
 				return promise;
 			},
@@ -51,15 +51,21 @@ module.exports = (asyncFunc, options={})=>{
 			value     : ()=>stash.value,
 			set       : (val)=>{
 				stash.value = val;
-				saga.emitter.emit('update');
+				contract.emitter.emit('update');
+				return instance;
+			},
+			fetch   : async ()=>{
+				if(typeof stash.value !== 'undefined') return stash.value;
+				return instance.call();
 			},
 			get : ()=>{
 				if(typeof stash.value !== 'undefined') return stash.value;
-				if(typeof stash.errors === 'undefined') instance.fetch();
+				if(typeof stash.errors === 'undefined') instance.call();
 			},
 		};
 		return instance;
 	};
-	saga.emitter = new EventEmitter();
-	return saga;
+	contract.emitter = new EventEmitter();
+	contract.clear = ()=>cache={};
+	return contract;
 };

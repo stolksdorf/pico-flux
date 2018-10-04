@@ -19,6 +19,7 @@ module.exports = (setters={}, getters={})=>{
 					return result;
 				}
 			});
+			return store;
 		},
 		setters: (funcs={})=>{
 			Object.keys(funcs).map((name)=>{
@@ -27,9 +28,9 @@ module.exports = (setters={}, getters={})=>{
 						memoize = {};
 						store.emitter.emit('update');
 					}
-					return store;
 				}
-			})
+			});
+			return store;
 		}
 	};
 	store.setters(setters);
