@@ -100,12 +100,12 @@ Returns a new React component that wraps the passed in `reactComponent`. THe `pr
 This Component helps reduce the logic and code within your more presentational components.
 
 ```js
-const SmartUserInfo = Component(UserInfo, [UserContract], ({ userId, ...props})=>{
-	const User = UserContract(userId);
+const SmartUserInfo = Component(UserInfo, [UserContract, Store], ({ userId, ...props})=>{
+	const User = UserContract(userId, Store.getLocation());
 	return {
-		user : User.get(),
+		user    : User.get(),
 		pending : User.isPending(),
-		errors : User.errors(),
+		errors  : User.errors(),
 		...props
 	};
 });

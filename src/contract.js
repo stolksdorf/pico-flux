@@ -17,8 +17,8 @@ module.exports = (asyncFunc, options={})=>{
 	const contract = (...args)=>{
 		const stash = getStash(args);
 		const instance = {
-			emit    : (evt='update')=>contract.emitter.emit(evt),
-			call    : async ()=>{
+			emit : (evt='update')=>contract.emitter.emit(evt),
+			call : async ()=>{
 				const promise = new Promise((resolve, reject)=>stash.deferred.push({resolve, reject}));
 				if(stash.pending) return promise;
 

@@ -10,7 +10,7 @@ module.exports = (setters={}, getters={})=>{
 	const store = {
 		emitter : new EventEmitter(),
 		emit    : (evt='update')=>store.emitter.emit(evt),
-		getters: (funcs={})=>{
+		getters : (funcs={})=>{
 			Object.keys(funcs).map((name)=>{
 				store[name] = (...args)=>{
 					if(memoize[name] && sameArray(memoize[name].args, args)) return memoize[name].result;
@@ -21,7 +21,7 @@ module.exports = (setters={}, getters={})=>{
 			});
 			return store;
 		},
-		setters: (funcs={})=>{
+		setters : (funcs={})=>{
 			Object.keys(funcs).map((name)=>{
 				store[name] = (...args)=>{
 					if(funcs[name](...args) !== false){
