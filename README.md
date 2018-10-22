@@ -14,6 +14,19 @@ As your project grows, it's easy to swap out to another more full-featured flux 
 npm install pico-flux
 ```
 
+
+
+
+## Smart Components
+a good react design pattern is to kepe your components as simple as possible. A smart compont can be used
+
+
+
+
+
+
+
+
 ### features
 
 - **Under 50 lines of code**

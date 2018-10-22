@@ -1,6 +1,7 @@
 
 
 
+
 ## Saga
 
 Dealing with asyncronous data is _very hard_. Especially when you want to capture all the potential states in frameworks that promote a functional mindset, such as React.

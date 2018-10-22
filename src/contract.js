@@ -1,3 +1,4 @@
+require('promise.prototype.finally').shim();
 const EventEmitter = require('events');
 
 module.exports = (asyncFunc, options={})=>{
@@ -18,13 +19,13 @@ module.exports = (asyncFunc, options={})=>{
 		const stash = getStash(args);
 		const instance = {
 			emit : (evt='update')=>contract.emitter.emit(evt),
-			call : async ()=>{
+			execute : async ()=>{
 				const promise = new Promise((resolve, reject)=>stash.deferred.push({resolve, reject}));
 				if(stash.pending) return promise;
 
 				stash.pending = true;
 				stash.errors = undefined;
-				contract.emitter.emit('fetch');
+				contract.emitter.emit('execute');
 				contract.emitter.emit('update');
 
 				asyncFunc(...args)
@@ -55,12 +56,12 @@ module.exports = (asyncFunc, options={})=>{
 				return instance;
 			},
 			fetch   : async ()=>{
-				if(typeof stash.value !== 'undefined') return stash.value;
-				return instance.call();
+				if(typeof stash.value !== 'undefined') return Promise.resolve(stash.value);
+				return instance.execute();
 			},
 			get : ()=>{
 				if(typeof stash.value !== 'undefined') return stash.value;
-				if(typeof stash.errors === 'undefined') instance.call();
+				if(typeof stash.errors === 'undefined') instance.execute();
 			},
 		};
 		return instance;
