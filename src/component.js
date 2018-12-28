@@ -1,5 +1,5 @@
-const React        = require('react');
-const createClass  = require('create-react-class');
+const React       = require('react');
+const createClass = require('create-react-class');
 
 const isDifferent = (a, b)=>{
 	for(let i in a) if(!(i in b)) return true;
@@ -22,6 +22,8 @@ const memoize = (func)=>{
 		}
 	}
 };
+
+//TODO: Think through what will happen with several of the same component
 
 module.exports = (component, sources=[], getProps=(props)=>props, options)=>{
 	if(!Array.isArray(sources)) sources = [sources];
