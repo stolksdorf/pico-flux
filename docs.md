@@ -37,11 +37,7 @@ While Sagas give you a lot of power, their signature might not always fit within
 
 
 ## Store
-A store is a mechanicism for storing syncronous changing data in your system. It shoould be easy and fast to extract values out of your store and to change data within your store. Whenever data changes within your store, the store will emit `update` events, so anything else in your system knows to fetch the freshest data.
-
-*Examples of things to store*
-- Logged-in user data
--
+A store is a mechanicism for storing syncronous changing data in your system. It should be easy and fast to extract values out of your store and to change data within your store. Whenever data changes within your store, the store will emit `update` events, so anything else in your system knows to fetch the freshest data.
 
 To build a store you define a series of `setters` and `getters`, which are functions that either update information within your store or extract out information.
 
@@ -52,9 +48,9 @@ If your setter returns `false`, then the store will not trigger an update. This 
 
 
 ### Getters
-While getters can just extract slices from your Store's state, they become most useful when they can do some filtering or calculations for your app. That way your components or other logic can simply call `store.getHighestScoringPlayer()` or `store.getTotalScore()`.
+While getters can just extract slices from your Store's state, they become very useful when they can do some filtering or calculations for your app. That way your components or other logic can simply call `store.getHighestScoringPlayer()` or `store.getTotalScore()`.
 
-Since getters are memoized, these calls can be rather expensive, since subsequent calls to them will return instantly. You should not store any calculated values within your Store's state.
+These calls might be expensive, but since getters are memoized subsequent calls to them will return instantly. You should not store any calculated values within your Store's state.
 
 
 ```js
@@ -80,11 +76,15 @@ const Store = require('pico-flux/store')(
 		}
 	},
 	{
-		getPlayers : ()=>State.players.filter((player)=>player.isPlaying),
-		getHighestScoringPlayer : ()=>{
+		getPlayers(){
+			return State.players.filter((player)=>player.isPlaying);
+		},
+		getHighestScoringPlayer(){
 			return Store.getPlayers().sort((player)=>player.score)[0];
 		},
-		getTotalScore : ()=>Store.getPlayers().reduce((sum, player)=>sum+player.score, 0)
+		getTotalScore(){
+			return Store.getPlayers().reduce((sum, player)=>sum+player.score, 0)
+		},
 	}
 );
 
@@ -94,10 +94,8 @@ module.exports = Store;
 In this example:
 
 - Both `getTotalScore()` and `getHighestScoringPlayer()` both use another `getter`. Since getters are memoized, we should get a performance bump by re-using them internally.
-- In `removePlayer` we return `false` if the id provided does not match any payer, as we do not want to emit `update` events when we didn't actually change anything.
+- In `removePlayer` we return `false` if the id provided does not match any player, as we do not want to emit `update` events when we didn't actually change anything.
 -
-
-
 
 
 
@@ -105,17 +103,18 @@ In this example:
 ## Actions
 While `pico-flux` doesn't provide any function for actions directly, I've found them to be a useful design pattern. Actions are usually project-spanning processes that either invovled several steps, or will effect many parts of your project at once. Examples: logging out, start game, set edit mode, etc.
 
-Actions are functions that emcompass your business logic and use stores, sagas, or async processes.
+Actions are functions that emcompass your business logic and use stores, contracts, or other libraries.
 
 
 ```js
 const Store = require('./user.store.js');
+const Contracts = require('./user.contracts.js');
 
 const Actions = {
 	logout : async (){
 		const user = Store.getCurrentUser();
 		if(!user) throw 'Not logged in';
-		await request.delete(`/session/${user.sessionId}`);
+		await Contracts.logout(user.sessionId).execute();
 		cookie.delete('session-cookie');
 		Store.setUser(null);
 		router.navigate(Routes.login);

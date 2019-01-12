@@ -10,30 +10,25 @@ module.exports = (setters={}, getters={})=>{
 	const store = {
 		emitter : new EventEmitter(),
 		emit    : (evt='update')=>store.emitter.emit(evt),
-		getters : (funcs={})=>{
-			Object.keys(funcs).map((name)=>{
-				store[name] = (...args)=>{
-					if(memoize[name] && sameArray(memoize[name].args, args)) return memoize[name].result;
-					const result = funcs[name](...args);
-					memoize[name] = {args, result};
-					return result;
-				}
-			});
-			return store;
+		getter : (name, func)=>{
+			store[name] = (...args)=>{
+				if(memoize[name] && sameArray(memoize[name].args, args)) return memoize[name].result;
+				const result = func(...args);
+				memoize[name] = {args, result};
+				return result;
+			}
 		},
-		setters : (funcs={})=>{
-			Object.keys(funcs).map((name)=>{
-				store[name] = (...args)=>{
-					if(funcs[name](...args) !== false){
-						memoize = {};
-						store.emitter.emit('update');
-					}
+		setter : (name, func)=>{
+			store[name] = (...args)=>{
+				if(func(...args) !== false){
+					memoize = {};
+					store.emitter.emit('update');
 				}
-			});
+			}
 			return store;
 		}
 	};
-	store.setters(setters);
-	store.getters(getters);
+	Object.keys(setters).map((name)=>store.setter(name, setters[name]));
+	Object.keys(getters).map((name)=>store.getter(name, getters[name]));
 	return store;
 };
