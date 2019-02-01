@@ -3,7 +3,7 @@ const React        = require('react');
 const EventEmitter = require('events');
 const createClass  = require('create-react-class');
 
-const Component = require('../src/component.js');
+const Component = require('../component.js');
 
 
 const wait = (val)=>{
@@ -18,7 +18,7 @@ const render = (comp, props, children) =>{
 test.group('rendering', (test)=>{
 
 	test('renders to a component', (t)=>{
-		const result = render(Component('div'));
+		const result = render(Component({component : 'div'}));
 		t.is(result.toJSON().type, 'div');
 		t.is(result.toJSON().children, null);
 	});
@@ -30,7 +30,7 @@ test.group('rendering', (test)=>{
 				return React.createElement('span', {}, 'custom');
 			}
 		});
-		const result = render(Component(custom));
+		const result = render(Component({component: custom}));
 		t.is(result.getInstance()._reactInternalFiber.type.displayName, 'CustomSmart');
 		t.is(result.toJSON().type, 'span');
 		t.is(result.toJSON().children, ['custom']);
@@ -49,8 +49,12 @@ test.group('Source Changes', (test)=>{
 				return React.createElement('div', null, this.props.children);
 			}
 		});
-		const Smart = Component(noisy, Source, (props)=>{
-			return { children : value };
+		const Smart = Component({
+			component : noisy,
+			sources : Source,
+			getProps : (props)=>{
+				return { children : value };
+			}
 		});
 
 		const result = render(Smart);
@@ -78,10 +82,14 @@ test.group('Source Changes', (test)=>{
 				return React.createElement('div', null, this.props.children);
 			}
 		});
-		const Smart = Component(noisy, Source, (props)=>{
-			updateCount++;
-			//console.log('update', updateCount);
-			return { children : value };
+		const Smart = Component({
+			component: noisy,
+			sources: Source,
+			getProps: (props)=>{
+				updateCount++;
+				//console.log('update', updateCount);
+				return { children : value };
+			}
 		});
 
 		t.is(updateCount, 0);
@@ -122,12 +130,16 @@ test('should call update once on init render', (t)=>{
 			return React.createElement('div', null, this.props.children);
 		}
 	});
-	const Smart = Component(noisy, undefined, ({ value })=>{
-		updateCount++;
-		//console.log('update', updateCount);
-		return { children : value };
+	const Smart = Component({
+		component: noisy,
+		sources: undefined,
+		getProps: ({ value })=>{
+			updateCount++;
+			//console.log('update', updateCount);
+			return { children : value };
+		}
 	});
-	const result = render(Smart, { value : 3 });
+	render(Smart, { value : 3 });
 	t.is(renderCount, 1);
 	t.is(updateCount, 1);
 });
@@ -140,8 +152,12 @@ test.group('Prop Change', (test)=>{
 				return React.createElement('div', null, this.props.children);
 			}
 		});
-		const Smart = Component(noisy, undefined, ({ value })=>{
-			return { children : value };
+		const Smart = Component({
+			component: noisy,
+			sources: undefined,
+			getProps: ({ value })=>{
+				return { children : value };
+			}
 		});
 
 		const result = render(Smart, { value : 'test1' });
@@ -161,10 +177,14 @@ test.group('Prop Change', (test)=>{
 				return React.createElement('div', null, this.props.children);
 			}
 		});
-		const Smart = Component(noisy, undefined, ({ value })=>{
-			updateCount++;
-			//console.log('update', updateCount);
-			return { children : value };
+		const Smart = Component({
+			component: noisy,
+			sources: undefined,
+			getProps: ({ value })=>{
+				updateCount++;
+				//console.log('update', updateCount);
+				return { children : value };
+			}
 		});
 
 		const result = render(Smart, { value : 'test1' });
@@ -187,11 +207,15 @@ test('listens to multiple sources', async (t)=>{
 	const Source1 = {emitter: new EventEmitter()};
 	const Source2 = {emitter: new EventEmitter()};
 
-	const Smart = Component('div', [Source1, Source2], (props)=>{
-		updateCount++;
-		return { children : updateCount};
+	const Smart = Component({
+		component : 'div',
+		sources : [Source1, Source2],
+		getProps : (props)=>{
+			updateCount++;
+			return { children : updateCount};
+		}
 	});
-	const result = render(Smart);
+	render(Smart);
 
 	t.is(updateCount, 1);
 
@@ -206,9 +230,6 @@ test('listens to multiple sources', async (t)=>{
 	Source2.emitter.emit('update');
 	await wait();
 	t.is(updateCount, 4);
-})
-
-
-
+});
 
 module.exports = test;

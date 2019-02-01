@@ -76,7 +76,7 @@ Access to the store's [Event Emitter](https://nodejs.org/api/events.html#events_
 A Contract is a long-lived wrapper around an async function. It tracks error and pending states, and will also cache previously called execututions. They also ensure that only one request of the async function will be in-flight at a time. Whenever the state of a contract changes it has a built-in event emitter to emit change notifications. Contracts are useful when you have mutilple parts of your application that all rely on a single async source.
 
 
-#### `Contract(async fn) -> contract instance`
+#### `Contract(async fn, options) -> contract instance`
 Creates a new contract wrapping the passed in async function.
 
 ```js
@@ -88,6 +88,11 @@ const UserContract = Contract(async (userId)=>{
 UserContract('abc123').get();
 UserContract.emitter.on('update', ()=>{...});
 ```
+
+*options8
+- `event: 'update'` - Change the name of the event
+- `clientOnly: false` - Will only execute the async function if it's on the client. Automaticlaly set to `true` if the contract is used as a source for a smart component.
+
 
 
 #### `contract.emitter`
@@ -163,3 +168,11 @@ const SmartUserInfo = Component(UserInfo, [UserContract, Store], ({ userId, ...p
 ```
 
 
+
+
+## Cool ideas
+- Feed a contract into a store
+- Use store + contract together
+- Clear contract on timer
+- Database vanish
+-
