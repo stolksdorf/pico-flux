@@ -23,6 +23,7 @@ const memoize = (func) => {
 	};
 };
 
+//TODO: Re-work with React Hooks.
 module.exports = ({ component, sources=[], getProps=(props)=>props, options }) => {
 	if(!Array.isArray(sources)) sources = [sources];
 	sources.map((source) => source.usedByComponent = true);

@@ -17,6 +17,7 @@ module.exports = (asyncFunc, options = {}) => {
 	};
 	const contract = (...args) => {
 		const stash = getStash(args);
+		//TODO: Instance might be able to be combined into the stash
 		const instance = {
 			emit    : (evt = 'update') => contract.emitter.emit(evt),
 			execute : async () => {

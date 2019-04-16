@@ -25,7 +25,6 @@ module.exports = (setters = {}, getters = {}) => {
 					store.emitter.emit('update');
 				}
 			};
-			return store;
 		},
 	};
 	Object.keys(setters).map((name) => store.setter(name, setters[name]));
