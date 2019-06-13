@@ -29,12 +29,12 @@
   },
   "homepage": "https://github.com/stolksdorf/pico-flux#readme",
   "dependencies": {
+    "create-react-class": "^15.6.3",
     "promise.prototype.finally": "^3.1.0",
-    "react": "^16.8.6"
+    "react": "^16.8.6",
+    "react-test-renderer": "^16.8.6"
   },
   "devDependencies": {
-    "pico-check": "^1.1.1",
-    "create-react-class": "^15.6.2",
-    "react-test-renderer": "^16.5.2"
+    "pico-check": "^1.1.1"
   }
 }

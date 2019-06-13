@@ -31,7 +31,7 @@ test.group('rendering', (test)=>{
 			}
 		});
 		const result = render(Component({component: custom}));
-		t.is(result.getInstance()._reactInternalFiber.type.displayName, 'CustomSmart');
+		t.is(result.toTree().type.displayName, 'CustomSmart');
 		t.is(result.toJSON().type, 'span');
 		t.is(result.toJSON().children, ['custom']);
 	});

@@ -52,7 +52,7 @@ module.exports = ({ component, sources=[], getProps=(props)=>props, options }) =
 		};
 		React.useEffect(()=>{
 			sources.map((source) => source.emitter.on(opts.event, sourceHandler));
-			return sources.map((source) => source.emitter.removeListener(opts.event, sourceHandler));
+			return ()=>sources.map((source) => source.emitter.removeListener(opts.event, sourceHandler));
 		}, [])
 		return React.createElement(component, cachedProps.get(props));
 	}
