@@ -3,7 +3,7 @@ const React        = require('react');
 const EventEmitter = require('events');
 const createClass  = require('create-react-class');
 
-const Component = require('../component.js');
+const Component = require('../src/component.js');
 
 
 const wait = (val)=>{
