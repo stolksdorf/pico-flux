@@ -1,7 +1,7 @@
 # pico-flux
 An incredibly tiny version of flux. **Under 50 lines of code**.
 
-[![NPM](https://nodei.co/npm/pico-flux.png)](https://nodei.co/npm/pico-flux/)
+[![npm version](https://badge.fury.io/js/pico-flux.svg)](https://badge.fury.io/js/pico-flux)
 
 **Goal** : pico-flux was made to quickly bootstrap your project with a easy to understand and agnostic implementation of Flux.
 If you need to make modifications or add features, it's easy to understand what's happening under the hood and make tweaks.
