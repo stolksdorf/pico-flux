@@ -1,16 +1,23 @@
 let test = require('pico-check');
 const React        = require('react');
 const EventEmitter = require('events');
+
+const TestRenderer = require('react-test-renderer');
+
 const createClass  = require('create-react-class');
 
 const Component = require('../src/component.js');
 
 
 const wait = (val)=>{
-	return new Promise((resolve, reject)=>{setTimeout(()=>resolve(val), 1)});
+	return new Promise((resolve, reject)=>{setTimeout(()=>resolve(val), 10)});
 };
 const render = (comp, props, children) =>{
-	return require('react-test-renderer').create(React.createElement(comp, props, children));
+	let tree;
+	TestRenderer.act(()=>{
+		tree = TestRenderer.create(React.createElement(comp, props, children));
+	})
+	return tree;
 };
 
 
@@ -63,6 +70,7 @@ test.group('Source Changes', (test)=>{
 		Source.emitter.emit('update');
 		await wait();
 
+
 		t.is(result.toJSON().children, [value]);
 
 		value = "test2";
@@ -78,7 +86,6 @@ test.group('Source Changes', (test)=>{
 			displayName:'Noisy',
 			render(){
 				renderCount++;
-				//console.log('render', renderCount);
 				return React.createElement('div', null, this.props.children);
 			}
 		});
@@ -87,7 +94,6 @@ test.group('Source Changes', (test)=>{
 			sources: Source,
 			getProps: (props)=>{
 				updateCount++;
-				//console.log('update', updateCount);
 				return { children : value };
 			}
 		});
@@ -99,13 +105,9 @@ test.group('Source Changes', (test)=>{
 		t.is(updateCount, 1);
 		t.is(renderCount, 1);
 
-		//console.log('update', updateCount);
-		//console.log('render', renderCount);
 
 		Source.emitter.emit('update');
 		await wait();
-		//console.log('update', updateCount);
-		//console.log('render', renderCount);
 
 		t.is(updateCount, 2);
 		t.is(renderCount, 1);
@@ -126,7 +128,6 @@ test('should call update once on init render', (t)=>{
 		displayName:'Noisy',
 		render(){
 			renderCount++;
-			//console.log('render', renderCount);
 			return React.createElement('div', null, this.props.children);
 		}
 	});
@@ -135,7 +136,6 @@ test('should call update once on init render', (t)=>{
 		sources: undefined,
 		getProps: ({ value })=>{
 			updateCount++;
-			//console.log('update', updateCount);
 			return { children : value };
 		}
 	});
@@ -173,7 +173,6 @@ test.group('Prop Change', (test)=>{
 			displayName:'Noisy',
 			render(){
 				renderCount++;
-				//console.log('render', renderCount);
 				return React.createElement('div', null, this.props.children);
 			}
 		});
@@ -182,7 +181,6 @@ test.group('Prop Change', (test)=>{
 			sources: undefined,
 			getProps: ({ value })=>{
 				updateCount++;
-				//console.log('update', updateCount);
 				return { children : value };
 			}
 		});
