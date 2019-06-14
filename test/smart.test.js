@@ -6,7 +6,7 @@ const TestRenderer = require('react-test-renderer');
 
 const createClass  = require('create-react-class');
 
-const Component = require('../src/component.js');
+const Smart = require('../src/smart.js');
 
 
 const wait = (val)=>{
@@ -24,8 +24,8 @@ const render = (comp, props, children) =>{
 
 test.group('rendering', (test)=>{
 
-	test('renders to a component', (t)=>{
-		const result = render(Component('div'));
+	test('renders to a Smart Component', (t)=>{
+		const result = render(Smart('div'));
 		t.is(result.toJSON().type, 'div');
 		t.is(result.toJSON().children, null);
 	});
@@ -37,7 +37,7 @@ test.group('rendering', (test)=>{
 				return React.createElement('span', {}, 'custom');
 			}
 		});
-		const result = render(Component(custom));
+		const result = render(Smart(custom));
 		t.is(result.toTree().type.displayName, 'CustomSmart');
 		t.is(result.toJSON().type, 'span');
 		t.is(result.toJSON().children, ['custom']);
@@ -56,11 +56,11 @@ test.group('Source Changes', (test)=>{
 				return React.createElement('div', null, this.props.children);
 			}
 		});
-		const Smart = Component(noisy, Source, (props)=>{
+		const comp = Smart(noisy, Source, (props)=>{
 			return { children : value };
 		})
 
-		const result = render(Smart);
+		const result = render(comp);
 		t.is(result.toJSON().children, [value]);
 
 		Source.emitter.emit('update');
@@ -85,7 +85,7 @@ test.group('Source Changes', (test)=>{
 				return React.createElement('div', null, this.props.children);
 			}
 		});
-		const Smart = Component(noisy, Source, (props)=>{
+		const comp = Smart(noisy, Source, (props)=>{
 			updateCount++;
 			return { children : value };
 		});
@@ -93,7 +93,7 @@ test.group('Source Changes', (test)=>{
 		t.is(updateCount, 0);
 		t.is(renderCount, 0);
 
-		const result = render(Smart);
+		const result = render(comp);
 		t.is(updateCount, 1);
 		t.is(renderCount, 1);
 
@@ -123,12 +123,12 @@ test('should call update once on init render', (t)=>{
 			return React.createElement('div', null, this.props.children);
 		}
 	});
-	const Smart = Component(noisy, undefined, ({ value })=>{
+	const comp = Smart(noisy, undefined, ({ value })=>{
 		updateCount++;
 		return { children : value };
 	});
 
-	render(Smart, { value : 3 });
+	render(comp, { value : 3 });
 	t.is(renderCount, 1);
 	t.is(updateCount, 1);
 });
@@ -141,14 +141,14 @@ test.group('Prop Change', (test)=>{
 				return React.createElement('div', null, this.props.children);
 			}
 		});
-		const Smart = Component(noisy, undefined, ({ value })=>{
+		const comp = Smart(noisy, undefined, ({ value })=>{
 			return { children : value };
 		});
 
-		const result = render(Smart, { value : 'test1' });
+		const result = render(comp, { value : 'test1' });
 		t.is(result.toJSON().children, ['test1']);
 
-		result.update(React.createElement(Smart, {value : 'test2'}));
+		result.update(React.createElement(comp, {value : 'test2'}));
 		t.is(result.toJSON().children, ['test2']);
 	});
 
@@ -161,20 +161,20 @@ test.group('Prop Change', (test)=>{
 				return React.createElement('div', null, this.props.children);
 			}
 		});
-		const Smart = Component(noisy, undefined, ({ value })=>{
+		const comp = Smart(noisy, undefined, ({ value })=>{
 			updateCount++;
 			return { children : value };
 		});
 
-		const result = render(Smart, { value : 'test1' });
+		const result = render(comp, { value : 'test1' });
 		t.is(renderCount, 1);
 		t.is(updateCount, 1);
 
-		result.update(React.createElement(Smart, {value : 'test2'}));
+		result.update(React.createElement(comp, {value : 'test2'}));
 		t.is(renderCount, 2);
 		t.is(updateCount, 2);
 
-		result.update(React.createElement(Smart, {value : 'test2'}));
+		result.update(React.createElement(comp, {value : 'test2'}));
 		t.is(renderCount, 3);
 		t.is(updateCount, 2);
 	});
@@ -186,11 +186,11 @@ test('listens to multiple sources', async (t)=>{
 	const Source1 = {emitter: new EventEmitter()};
 	const Source2 = {emitter: new EventEmitter()};
 
-	const Smart = Component('div', [Source1, Source2], (props)=>{
+	const comp = Smart('div', [Source1, Source2], (props)=>{
 		updateCount++;
 		return { children : updateCount};
 	});
-	render(Smart);
+	render(comp);
 
 	t.is(updateCount, 1);
 

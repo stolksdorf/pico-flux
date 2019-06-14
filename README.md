@@ -17,9 +17,9 @@ npm install pico-flux
 
 ### features
 - Three major parts: Stores, Contracts, Smart Components
-- *Stores*: Syncronous event-y data store for smart components. Has builtin of memoization for incredibly fast re-renders.
-- *Contracts*: Asyncronous event-y data store for smart components. Wraps an existing async function and provides methods for tracking in-flight requests, errors, and cached values.
-- *Smart Components*: A wrapper around a React component that responds to events from *Stores and *Contracts* intelligenetly to re-render. Decoupling your data storage layer from your interfaces.
+- **Stores**: Syncronous event-y data store for smart components. Has builtin of memoization for incredibly fast re-renders.
+- **Contracts**: Asyncronous event-y data store for smart components. Wraps an existing async function and provides methods for tracking in-flight requests, errors, and cached values.
+- **Smart Components**: A wrapper around a React component that responds to events from Stores and Contracts intelligently to re-render. Decoupling your data storage layer from your interfaces.
 
 
 ### Example
@@ -189,7 +189,7 @@ Updates the value of the contract's cache manually, will also emit an `update` e
 #### `contract(...args).isPending() -> boolean`
 Returns `true`/`false` if the contract currently processing the async function.
 
-#### `contract(...args).errors() -> null/Error`
+#### `contract(...args).errors() -> null/Error Obj`
 Returns the last error from the async function if it was rejected, `null` if there are no errors currently. This is cleared before any call to the async funcution.
 
 #### `contract(...args).value() -> any`
@@ -210,18 +210,18 @@ Returns the value currently cached within the contract instance.
 
 
 
-## Component
+## Smart Component
 
 
-#### `Component(component, sources=[], getProps=(props)=>{}, [options]) -> smartComponent`
-Returns a new React component that wraps the passed in `component`. The `props` passed to the `smartComponent` will be used as arguments for `getProps`. The result of `getProps` will be passed as `props` to render the `component`.
+#### `Smart(component, sources=[], getProps=(props)=>{}, [options]) -> smartComponent`
+Returns a new React component that wraps the passed in `component`. The `props` passed to the `smartComponent` will be used as arguments for `getProps`. The result of `getProps` will be passed as `props` to render the wrapped `component`.
 
-`smartComponent` will attempt to re-render when an `update` event happens from one of the `sources`. The `sources` be can a mix of Stores and/or Contracts. Component will only update if there are actual changes, it does this by checking the reference of new props and the old props. If you are using data from Stores or Contracts, they will be passed by reference and should limit the amount of re-renders by a fair bit.
+`smartComponent` will attempt to re-render when an `update` event happens from one of the `sources`. The `sources` be can a mix of Stores and/or Contracts. Smart will only update if there are actual changes, it does this by checking the reference of new props and the old props. If you are using data from Stores or Contracts, they will be passed by reference and should limit the amount of re-renders by a fair bit.
 
-This Component helps reduce the logic and code within your more presentational components.
+This Smart Component helps reduce the logic and code within your more presentational components.
 
 ```js
-const UserInfoSmart = Component(UserInfo, [UserContract, Store], ({ userId, ...props })=>{
+const UserInfoSmart = Smart(UserInfo, [UserContract, Store], ({ userId, ...props })=>{
     const User = UserContract(userId, Store.getLocation());
     return {
         user    : User.get(),
@@ -234,4 +234,4 @@ const UserInfoSmart = Component(UserInfo, [UserContract, Store], ({ userId, ...p
 <UserInfoSmart userId={'abc123'} hidden={false} />
 ```
 
-In this example the `UserInfoSmart` component will re-render if the User contract changes, if the location form the store changes, or if any of the passed in props (such as `hidden`) change.
+In this example the `UserInfoSmart` component will re-render if the User contract changes, if the location form the store changes, or if any of the passed in props (such as `hidden`) change. Also `UserInfo` can now be written in a very straight forward way, assuming it will just get the user object as a prop.
