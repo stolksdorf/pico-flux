@@ -1,5 +1,5 @@
 const test = require('pico-check');
-const Contract = require('../contract.js');
+const Contract = require('../src/contract.js');
 
 const wait = (val) => {
 	return new Promise((resolve, reject) => {setTimeout(() => resolve(val), 20);});

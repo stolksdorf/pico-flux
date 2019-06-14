@@ -1,5 +1,5 @@
 const test = require('pico-check');
-const Store = require('../store.js');
+const Store = require('../src/store.js');
 
 //test = test.only();
 

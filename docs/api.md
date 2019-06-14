@@ -36,7 +36,9 @@ Store.getter('getWinningPlayer', ()=>{
 		if(winner.score < player.score) return player;
 		return winner;
 	}, false);
-})
+});
+
+Store.getWinningPlayer(); //You
 ```
 
 In this example, multiple calls to `getActivePlayers()` and `getWinningPlayer()` will be memozied, allowing us to write straight forward code, while still being performat even if many components are calling these functions.
@@ -55,6 +57,8 @@ Store.setter('removePlayer', (name)=>{
 	if(idx == -1) return false;
 	State.players.splice(idx, 1);
 })
+
+Store.addNewPlayer('You', '#BestTeam');
 ```
 
 In this example, we don't want an update to fire when we can't find the player to remove, so we return `false`.
@@ -68,8 +72,20 @@ Manually emits an event. This can be useful in niche situations where there are 
 Access to the store's [Event Emitter](https://nodejs.org/api/events.html#events_class_eventemitter)
 
 
+
+
+
+
+
+
+
+
 ## Contract
-A Contract is a long-lived wrapper around an async function. It tracks error and pending states, and will also cache previously called executions. They also ensure that only one request of the async function will be in-flight at a time, even if multiple calls are made. Whenever the state of a contract changes it has a built-in event emitter to emit change notifications. Contracts are useful when you have mutilple parts of your application that all rely on a single async source.
+A Contract is a long-lived wrapper around an async function. It tracks error and pending states, and will also cache previously called executions. They also ensure that only one request of the async function will be in-flight at a time, even if multiple calls are made. Whenever the state of a contract changes it has a built-in event emitter to emit change notifications. Contracts share the exact same event signature with [Stores](#stores) so they can both be used with [Components](#Components). Contracts are useful when you have mutilple parts of your application that all rely on a single async source.
+
+- Event
+- Memoized
+-
 
 
 #### `Contract(async fn, options) -> contract instance`
@@ -79,6 +95,11 @@ Creates a new contract wrapping the passed in async function.
 const UserContract = Contract(async (userId)=>{
 	return request.get(`/api/user/${userId}`)
 		.then((response)=>response.body.user)
+});
+
+//TODO: Add in DB example
+const PostsContract = Contract(async (postQuery)=>{
+	return await postDatabase.lookup(postQuery);
 });
 
 UserContract('abc123').get();
@@ -95,7 +116,7 @@ UserContract.emitter.on('update', ()=>{...});
 Access to the contract's [Event Emitter](https://nodejs.org/api/events.html#events_class_eventemitter)
 
 #### `contract.clear()`
-Clears out the contract's internal cache of values, pending/eror states, and deferred promises for all instances. Does not emit any events.
+Clears out the contract's internal cache of values, pending/error states, and deferred promises for all instances. Does not emit any events.
 
 
 #### `contract(...args) -> instance`
@@ -109,7 +130,7 @@ Executes the `async fn` with the `args`. This puts several things in motion:
 - emits a `execute` and `update` event on the contract instance.
 - if successful, caches the returned value, sets pending to false, resolves all promises with the value, and emits `finish`
 - if not successful, sets the contract's errors, sets pending to false, rejects all promises and emits `oops`
-- And finally emits an `update`
+- And finally emits another `update`
 
 This is useful if you definitely want the async function to run regardless of cached values or error states.
 
@@ -141,8 +162,8 @@ Returns the value currently cached within the contract instance.
 ## Component
 
 
-#### `Component({ component, sources=[], getProps=()=>{}, [options]}) -> smartComponent`
-Returns a new React component that wraps the passed in `reactComponent`. The `props` passed to this will be used as arguments for `getProps`. The result of `getProps` will be passed as `props` to render the `reactComponent`.
+#### `Component({ component, sources=[], getProps=(props)=>{}, [options]}) -> smartComponent`
+Returns a new React component that wraps the passed in `component`. The `props` passed to the `smartComponent` will be used as arguments for `getProps`. The result of `getProps` will be passed as `props` to render the `component`.
 
 `smartComponent` will attempt to re-render when an `update` event happens from one of the `sources`. The `sources` be can a mix of Stores and/or Contracts. Component will only update if there are actual changes, it does this by checking the reference of new props and the old props. If you are using data from Stores or Contracts, they will be passed by reference and should limit the amount of re-renders by a fair bit.
 
@@ -167,6 +188,9 @@ const SmartUserInfo = Component({
 ```
 
 
+## Other Use Cases
+
+#### Database Varnish
 
 
 ## Cool ideas
