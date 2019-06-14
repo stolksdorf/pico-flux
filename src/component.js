@@ -1,4 +1,4 @@
-const React       = require('react');
+const React = require('react');
 
 const isDifferent = (a, b) => {
 	for (const i in a)if(!(i in b)) return true;
@@ -31,7 +31,7 @@ function useCacheProps(getPropsFn){
 	return cachedProps.current;
 }
 
-module.exports = ({ component, sources=[], getProps=(props)=>props, options }) => {
+module.exports = (component, sources=[], getProps=(props)=>props, options) => {
 	if(!Array.isArray(sources)) sources = [sources];
 	sources.map((source) => source.usedByComponent = true);
 	const opts = Object.assign({ event : 'update' }, options);
@@ -47,7 +47,7 @@ module.exports = ({ component, sources=[], getProps=(props)=>props, options }) =
 		React.useEffect(()=>{
 			sources.map((source)=>source.emitter.on(opts.event, sourceHandler))
 			return ()=>sources.map((source)=>source.emitter.removeListener(opts.event, sourceHandler))
-		}, [sources])
+		}, [sources, opts.event])
 		return React.createElement(component, cachedProps.get(props));
 	}
 	Component.displayName = `${component.displayName}Smart`;
