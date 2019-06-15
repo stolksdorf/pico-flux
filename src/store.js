@@ -20,10 +20,12 @@ module.exports = (setters = {}, getters = {}) => {
 		},
 		setter : (name, func) => {
 			store[name] = (...args) => {
-				if(func(...args) !== false){
+				const result = func(...args);
+				if(result !== false){
 					memoize = {};
 					store.emitter.emit('update');
 				}
+				return result;
 			};
 		},
 	};

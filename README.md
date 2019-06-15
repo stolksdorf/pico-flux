@@ -50,34 +50,11 @@ const Store = require('pico-flux/store');
 let State = { players : [] };
 
 module.exports = Store({
-    setPlayers : (players)=>{
-        State.players = players;
-    }
+    setPlayers : (players)=>State.players = players,
 }, {
-    getPlayers : ()=>{
-        return State.players
-    }
+    getPlayers : ()=>State.players
 });
 ```
-
-
-#### `store.getter([name], [function])`
-Creates new `getter` onto the store. In `pico-flux`, `getter` are memoized-once allowing multiple calls with the same parameters back-to-back to be resolved instantly. Whenever a `setter` is called, the memoziation for the store will be cleard.
-
-```js
-Store.getter('getActivePlayers' ()=>State.players.filter((player)=>!!player.isActive))
-Store.getter('getWinningPlayer', ()=>{
-    return Store.getActivePlayers().reduce((winner, player)=>{
-        if(!winner) return player;
-        if(winner.score < player.score) return player;
-        return winner;
-    }, false);
-});
-
-Store.getWinningPlayer(); //You
-```
-
-In this example, multiple calls to `getActivePlayers()` and `getWinningPlayer()` will be memozied, allowing us to write straight forward code, while still being performat even if many components are calling these functions.
 
 
 #### `store.setter([name], [function])`
@@ -98,6 +75,27 @@ Store.addNewPlayer('You', '#BestTeam');
 ```
 
 In this example, we don't want an update to fire when we can't find the player to remove, so we return `false`.
+
+
+
+
+#### `store.getter([name], [function])`
+Creates new `getter` onto the store. In `pico-flux`, `getter` are memoized-once allowing multiple calls with the same parameters back-to-back to be resolved instantly. Whenever a `setter` is called, the memoziation for the store will be cleard.
+
+```js
+Store.getter('getActivePlayers' ()=>State.players.filter((player)=>!!player.isActive))
+Store.getter('getWinningPlayer', ()=>{
+    return Store.getActivePlayers().reduce((winner, player)=>{
+        if(!winner) return player;
+        if(winner.score < player.score) return player;
+        return winner;
+    }, false);
+});
+
+Store.getWinningPlayer(); //You
+```
+
+In this example, multiple calls to `getActivePlayers()` and `getWinningPlayer()` will be memozied, allowing us to write straight forward code, while still being performat even if many components are calling these functions.
 
 
 
@@ -137,7 +135,6 @@ const UserContract = Contract(async (userId)=>{
         .then((response)=>response.body.user)
 });
 
-//TODO: Add in DB example
 const PostsContract = Contract(async (postQuery)=>{
     return await postDatabase.lookup(postQuery);
 });

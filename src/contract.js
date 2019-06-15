@@ -22,6 +22,7 @@ module.exports = (asyncFunc, options = {}) => {
 			emit    : (evt = 'update') => contract.emitter.emit(evt),
 			execute : async () => {
 				if((options.clientOnly || contract.usedByComponent) && typeof window === 'undefined'){
+					//TODO: possibly set pending before here?
 					return;
 				}
 				const promise = new Promise((resolve, reject) => stash.deferred.push({ resolve, reject }));
