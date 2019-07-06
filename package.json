@@ -1,6 +1,6 @@
 {
   "name": "pico-flux",
-  "version": "4.0.2",
+  "version": "4.1.0",
   "description": "An incredibly tiny version of flux",
   "main": "src/index.js",
   "scripts": {
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "pico-check": "^1.1.1",
-    "create-react-class": "^15.6.3",
+    "react-dom": "^16.8.6",
     "react-test-renderer": "^16.8.6"
   },
   "peerDependacies": {

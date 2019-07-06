@@ -117,9 +117,6 @@ Access to the store's [Event Emitter](https://nodejs.org/api/events.html#events_
 ## Contract
 A Contract is a long-lived wrapper around an async function. It tracks error and pending states, and will also cache previously called executions. They also ensure that only one request of the async function will be in-flight at a time, even if multiple calls are made. Whenever the state of a contract changes it has a built-in event emitter to emit change notifications. Contracts share the exact same event signature with [Stores](#stores) so they can both be used with [Components](#Components). Contracts are useful when you have mutilple parts of your application that all rely on a single async source.
 
-- Event
-- Memoized
--
 
 
 #### `Contract(async fn, options) -> contract instance`
@@ -197,14 +194,58 @@ Returns the value currently cached within the contract instance.
 
 
 
+## Smart Hook
+
+A [React Hook]() that _hooks into_ updates from either a Store or a Contract.
+
+#### `const value = useSmartHook(Source, getter=()=>{}, [prop_dependacies], [opts])`
+Executes the `getter` and stores the value into state in between re-renders. If the `source` updates, it will re-execute the `getter` and if it's result has changed it will update the state and re-render the component.
+
+```jsx
+
+//example
+
+```
+
+If your `getter` depends on any passed in props, you must define them in the `prop_dependacies` array, so the hook knows to reset the state on certain prop changes.
+
+```jsx
+const Comp = ({ id, content })=>{
+    const value = useSmartHook(Store, ()=>Store.getValue(id), [id]);
+    return <div>{value}</div>
+}
+```
+
+_In this example:_ the `getter` both depends on the value of `id` and the `Store`. So you must add `[id]` to let the hook know it should re-run when the `id` changes value
 
 
+### Smart Components
+
+A very useful design pattern is to make a "smart" and a "dumb" version of a component that relies on a store or contract. The "dumb" component is very functional and only uses whatever data is passed in via props, doesn't know that Stores, Contracts, or Actions exist. The "smart" version wraps the dumb component and passes if the relevant information and handlers it needs from various Stores, Contracts, and Actions.
+
+This seperation of concerns allows for unit-testable "dumb" components, and greatly simplifies designing both.
+
+```js
+const UserInfoSmart = ({ userId, ...props })=>{
+    const location = useSmartHook(Store, ()=>Store.getCurrentLocation());
+    const user = useSmartHook(UserContract, ()=>UserContract(userId, location), [userId, location]);
+
+    const onLogout = React.useCallback(()=>Actions.logout(userId), [userId]);
+
+    return {
+        user    : user.get(),
+        pending : user.isPending(),
+        errors  : user.errors(),
+        onLogout,
+        ...props
+    };
+});
+
+<UserInfoSmart userId={'abc123'} hidden={false} />
+```
 
 
-
-
-
-
+<!--
 
 
 ## Smart Component
@@ -232,3 +273,4 @@ const UserInfoSmart = Smart(UserInfo, [UserContract, Store], ({ userId, ...props
 ```
 
 In this example the `UserInfoSmart` component will re-render if the User contract changes, if the location form the store changes, or if any of the passed in props (such as `hidden`) change. Also `UserInfo` can now be written in a very straight forward way, assuming it will just get the user object as a prop.
+ -->
