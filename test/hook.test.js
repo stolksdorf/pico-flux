@@ -5,7 +5,7 @@ const EventEmitter = require('events');
 const TestRenderer = require('react-test-renderer');
 
 
-const useSmartHook = require('../src/useSmartHook.js');
+const useSmartHook = require('../src/smartHook.js');
 
 
 const wait = (val, time = 10)=>{
