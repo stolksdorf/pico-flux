@@ -1,6 +1,6 @@
 {
   "name": "pico-flux",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "An incredibly tiny version of flux",
   "main": "src/index.js",
   "scripts": {
@@ -28,9 +28,7 @@
     "url": "https://github.com/stolksdorf/pico-flux/issues"
   },
   "homepage": "https://github.com/stolksdorf/pico-flux#readme",
-  "dependencies": {
-    "promise.prototype.finally": "^3.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "pico-check": "^1.1.1",
     "react-dom": "^16.8.6",
